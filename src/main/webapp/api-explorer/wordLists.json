@@ -1,0 +1,1 @@
+{"apis":[{"path":"/wordList.{format}","description":""},{"path":"/wordLists.{format}","description":""},{"path":"/account.{format}","description":""},{"path":"/word.{format}","description":""},{"path":"/words.{format}","description":""}],"swaggerVersion":"1.0","apiVersion":"4.0","basePath":""}
