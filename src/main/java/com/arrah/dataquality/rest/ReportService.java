@@ -816,7 +816,6 @@ public class ReportService implements ServiceIfce {
 
 	//25. Data Dictionary
 	@GET
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Path("/data_dictionary/")
 	@ApiOperation(value = "Service to store data dictionary of a database in PDF format", httpMethod = "GET", responseClass = "com.org.arrah.framework.DataDictionary")
 	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
