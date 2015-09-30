@@ -1,4 +1,4 @@
-package com.arrah.dataquality.rest;
+package com.arrah.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,13 +57,14 @@ import com.arrah.dataquality.core.UpdateRow;
 import com.arrah.dataquality.core.UpdateRowData;
 import com.arrah.dataquality.core.Variation;
 import com.arrah.dataquality.core.VolumeCount;
-import com.wordnik.swagger.annotations.ApiError;
-import com.wordnik.swagger.annotations.ApiErrors;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
 
-@XmlRootElement
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
+
+@Api(value = "Report Service", description = "Suit of reporting APIs")
+@Path("report")
 public class ReportService implements ServiceIfce {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
@@ -76,15 +76,6 @@ public class ReportService implements ServiceIfce {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Path("/tablename/")
 	@ApiOperation(value = "Service to get list of table names", httpMethod = "GET", notes = "Displays the names of all the tables in the database")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
 	public Response getTblName(@Context HttpServletResponse servletResponse)
 			 {
 		try{
@@ -106,16 +97,7 @@ public class ReportService implements ServiceIfce {
 	@Path("/columns/{table}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@ApiOperation(value = "Service to get column names", httpMethod = "GET", notes = "INPUT : Enter the name of a particular table present in the Database. "
-			+ "OUTPUT : Displays the names of all the columns of that table.", responseClass = "com.arrah.prd.dataquality.ColumnStore")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the names of all the columns of that table.", response = ColumnStore.class)
 	public Response getClmData(
 			@ApiParam(value = "Table name for which the columns are to be fetched", required = true) @PathParam("table") String table,
 			@Context HttpServletResponse servletResponse){
@@ -137,16 +119,7 @@ public class ReportService implements ServiceIfce {
 	@Path("/table_data/{table}/{start}/{range}/")
 	@ApiOperation(value = "Service to get data of table", httpMethod = "GET", notes = "PURPOSE : To fetch the data of a particular table in the database. "
 			+ "INPUT : Enter the name of a particular table present in the Database. "
-			+ "OUTPUT : Displays the column names as well as the data in the columns of that table. ", responseClass = "com.arrah.prd.dataquality.Table")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the column names as well as the data in the columns of that table. ", response = Table.class)
 	public Response getTableData(
 			@ApiParam(value = "Table name for which the data is to be fetched", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Start point for which the data is to be fetched", required = true) @PathParam("start") int start,
@@ -171,16 +144,7 @@ public class ReportService implements ServiceIfce {
 	@ApiOperation(value = "Service to find profile information of a column by table name,column name", httpMethod = "GET", notes = "PURPOSE : To fetch the profile information "
 			+ "of a particular column of a table in the database. "
 			+ "INPUT : Enter the name of a column and the table containing that particular column in the database. "
-			+ "OUTPUT : Displays the profile aspects of a column like TOTAL,UNIQUE,REPEAT,PATTERN,NULL. ", responseClass = "com.arrah.prd.dataquality.ColumnProfile")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the profile aspects of a column like TOTAL,UNIQUE,REPEAT,PATTERN,NULL. ", response = ColumnProfile.class)
 	public Response getColumnProfile(
 			@ApiParam(value = "Table name for which the profile information is to be fetched", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for which the profile information is to be fetched", required = true) @PathParam("column") String column,
@@ -203,16 +167,7 @@ public class ReportService implements ServiceIfce {
 	@ApiOperation(value = "Service to find data of a column by table name,column name", httpMethod = "GET", notes = "PURPOSE : To fetch all the entries "
 			+ "of a particular column of a table in the database. "
 			+ "INPUT : Enter the name of a column and the table containing that particular column in the database. "
-			+ "OUTPUT : Displays the data of the column with respect to the chosen table in the database. ", responseClass = "com.arrah.prd.dataquality.ColumnData")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the data of the column with respect to the chosen table in the database. ", response = ColumnData.class)
 	public Response getColumnData(
 			@ApiParam(value = "Table name for which the data is to be fetched", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for which the data is to be fetched", required = true) @PathParam("column") String column,
@@ -236,16 +191,7 @@ public class ReportService implements ServiceIfce {
 	@ApiOperation(value = "Service to find metadata by table name", httpMethod = "GET", notes = "PURPOSE : To fetch the metadata of a particular table in the database. "
 			+ "INPUT : Enter the name of a table present in the database. "
 			+ "OUTPUT : Displays the metadata like DATATYPE, SIZE, PRECISION, RADIX, REMARK, DEFAULT VALUE "
-			+ "for all the columns of the chosen table in the database. ", responseClass = "com.arrah.prd.dataquality.Table")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "for all the columns of the chosen table in the database. ", response = Table.class)
 	public Response getTableMetaData(
 			@ApiParam(value = "Table name for which the metadata is to be fetched", required = true) @PathParam("table") String table,
 			@Context HttpServletResponse servletResponse){
@@ -272,16 +218,7 @@ public class ReportService implements ServiceIfce {
 			+ "GRANTEE (one who gets the privileges granted by the grantor), "
 			+ "PRIVILEGES (to update, delete, insert, select, references, trigger) and "
 			+ "GRANTABLE (states if privileges are available to the grantee or not) "
-			+ "for the chosen table in the database. ", responseClass = "com.arrah.prd.dataquality.Table")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "for the chosen table in the database. ", response = Table.class)
 	public Response getTableprivilegesData(
 			@ApiParam(value = "Table name for which the privilege information is to be fetched", required = true) @PathParam("table") String table,
 			@Context HttpServletResponse servletResponse){
@@ -308,16 +245,7 @@ public class ReportService implements ServiceIfce {
 			+ "GRANTEE (one who gets the privileges granted by the grantor), "
 			+ "PRIVILEGES (to update, delete, insert, select, references, trigger) and "
 			+ "GRANTABLE (states if privileges are available to the grantee or not) "
-			+ "for all the columns of the chosen table in the database.", responseClass = "com.arrah.prd.dataquality.Columnprivileges")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "for all the columns of the chosen table in the database.", response = Columnprivileges.class)
 	public Response getColumnPrivilegesData(
 			@ApiParam(value = "Table name for which the column privilege information is to be fetched", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Table name for which the column privilege information is to be fetched", required = true) @PathParam("column") String column,
@@ -341,16 +269,7 @@ public class ReportService implements ServiceIfce {
 			+ "Input : Enter the name of a table present in the database. "
 			+ "Output : Displays the De-duplication information like DUPLICATE PATTERN, UNIQUE PERCENTAGE, "
 			+ "TOTAL COUNT, DUPLICATE COUNT, DUPLICATE PERCENTAGE, UNIQUE PATTERN "
-			+ "for the chosen table in the database.", responseClass = "com.arrah.prd.dataquality.TableDeDup")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "for the chosen table in the database.", response = TableDeDup.class)
 	public Response getTableDeDupData(
 			@ApiParam(value = "Table name for which the De-duplication information is to be fetched", required = true) @PathParam("table") String table,
 			@Context HttpServletResponse servletResponse) {
@@ -375,16 +294,7 @@ public class ReportService implements ServiceIfce {
 	@ApiOperation(value = "Service to delete data from a column of the table", httpMethod = "DELETE", notes = "PURPOSE : To delete the data in a particular column of the chosen table in the database. "
 			+ "INPUT : Enter the name of a table present in the database , name of the column and the value to be deleted. "
 			+ "OUTPUT : Displays a success message if the data gets deleted in the table "
-			+ "else displays error message.", responseClass = "com.arrah.prd.dataquality.DeleteRow")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "else displays error message.", response = DeleteRow.class)
 	public Response delete_row(
 			@ApiParam(value = "Table from which the data is to be deleted", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Coulmn from which the data is to be deleted", required = true) @PathParam("column") String column,
@@ -415,16 +325,7 @@ public class ReportService implements ServiceIfce {
 			+ "INPUT : Enter the name of a table present in the database, name of the column, the value to be updated, "
 			+ "the column name and the value against which the update has to be done. "
 			+ "OUTPUT : Displays a success message if the data gets updated in the table "
-			+ "else displays error message.", responseClass = "com.arrah.prd.dataquality.UpdateRow")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "else displays error message.", response = UpdateRow.class)
 	public Response update(
 			@ApiParam(value = "Table name in which data is to update", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name in which data is to be updated", required = true) @PathParam("column") String column,
@@ -454,16 +355,7 @@ public class ReportService implements ServiceIfce {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@ApiOperation(value = "Service to execute the query", httpMethod = "GET", notes = "Purpose : To execute the query. "
 			+ "Output : Displays the result of the query executed "
-			+ "else displays error message.", responseClass = "com.arrah.prd.dataquality.ExecuteQuery")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "else displays error message.", response = ExecuteQuery.class)
 	public Response execQuery(@QueryParam("query") String query)
 			{
 		ExecuteQueryData execQuery = null;
@@ -488,15 +380,6 @@ public class ReportService implements ServiceIfce {
 	@Path("/volume/")
 	@ApiOperation(value = "Service to find name of database and its size", httpMethod = "GET", notes = "PURPOSE : To find the data withheld in a particular database. "
 			+ "OUTPUT : Displays the name of the database and size of data it contains.")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
 	public Response getVolume() {
 		try{
 		DbVolume tblprv = new DbVolume(cookieValue);
@@ -516,16 +399,7 @@ public class ReportService implements ServiceIfce {
 			+ "Output : Displays SAMPLE SIZE (the different dates present between the dates given by the user) , "
 			+ "MINMUM/MAXIMUM(the minimum and the maximum number of entries respectively, on one particular day) , "
 			+ "AVERAGE, SUM, RANGE, VARIANCE, KURTOSIS, SKEWNESS of the date entries. "
-			+ "Bar graph and line plots of no. of entries w.r.t dates will also be displayed. ", responseClass = "com.arrah.prd.dataquality.VolumeCount")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "Bar graph and line plots of no. of entries w.r.t dates will also be displayed. ", response = VolumeCount.class)
 	public Response getVolumeCount(
 			@ApiParam(value = "Table name for entry information", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for entry information which has TIME/DATE/TIMESTAMP field", required = true) @PathParam("column") String column,
@@ -547,16 +421,7 @@ public class ReportService implements ServiceIfce {
 	@Path("/frequency_statistics/{table}/{column}/")
 	@ApiOperation(value = "Service to find frequency of a particular entry in a column of a table", httpMethod = "GET", notes = "PURPOSE : To get the frequency of a data entry in a column. "
 			+ "INPUT : Enter the table name and the column name. "
-			+ "OUTPUT : Displays the frequency of data of the particular column entered.", responseClass = "com.arrah.prd.dataquality.FreqStats")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the frequency of data of the particular column entered.", response = FreqStats.class)
 	public Response getColumnStats(
 			@ApiParam(value = "Table name for entry information", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for entry information", required = true) @PathParam("column") String column)
@@ -578,16 +443,7 @@ public class ReportService implements ServiceIfce {
 	@Path("/variance_statistics/{table}/{column}/")
 	@ApiOperation(value = "Service to find variation of data entries in a column of a table", httpMethod = "GET", notes = "PURPOSE : To get the variation of data in a column of a table. "
 			+ "INPUT : Enter the table name and the column name. "
-			+ "OUTPUT : Displays the AVERAGE, MAXIMUM, MINIMUM, RANGE, SAMPLE SIZE, SUM according to the data in a particular column. ", responseClass = "com.arrah.prd.dataquality.Variation")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+			+ "OUTPUT : Displays the AVERAGE, MAXIMUM, MINIMUM, RANGE, SAMPLE SIZE, SUM according to the data in a particular column. ", response = Variation.class)
 	public Response getvar(
 			@ApiParam(value = "Table name for variation information of data entries", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for variation information of data entries and this column must have numerical entries", required = true) @PathParam("column") String column)
@@ -612,7 +468,7 @@ public class ReportService implements ServiceIfce {
 	// "Service to get the information about a data entry from two different tables",
 	// httpMethod = "GET", notes =
 	// "INPUT : Enter the table name and the column name in that table. "
-	// + "OUTPUT : Displays the common entries of two tables. ", responseClass =
+	// + "OUTPUT : Displays the common entries of two tables. ", response =
 	// "com.arrah.prd.dataquality.Joins")
 	// @ApiErrors({ @ApiError(code = 200, reason = "OK"),
 	// @ApiError(code = 204, reason = "No Content"),
@@ -651,7 +507,7 @@ public class ReportService implements ServiceIfce {
 	// "INPUT : Enter the table name and the column name in that table. "
 	// +
 	// "OUTPUT : Displays all the entries of the first table in addition to those which are common to both the tables. ",
-	// responseClass = "com.arrah.prd.dataquality.Joins")
+	// response = "com.arrah.prd.dataquality.Joins")
 	// @ApiErrors({ @ApiError(code = 200, reason = "OK"),
 	// @ApiError(code = 204, reason = "No Content"),
 	// @ApiError(code = 400, reason = "Bad Request"),
@@ -689,7 +545,7 @@ public class ReportService implements ServiceIfce {
 	// "INPUT : Enter the table name and the column name in that table. "
 	// +
 	// "OUTPUT : Displays all the entries of the second table in addition to those which are common to both the tables. ",
-	// responseClass = "com.arrah.prd.dataquality.Joins")
+	// response = "com.arrah.prd.dataquality.Joins")
 	// @ApiErrors({ @ApiError(code = 200, reason = "OK"),
 	// @ApiError(code = 204, reason = "No Content"),
 	// @ApiError(code = 400, reason = "Bad Request"),
@@ -725,7 +581,7 @@ public class ReportService implements ServiceIfce {
 	// @ApiOperation(value = "Service to merge the data of the tables",
 	// httpMethod = "GET", notes =
 	// "INPUT : Enter the table name and the column name in that table. "
-	// + "OUTPUT : Displays all the entries of both the tables. ", responseClass
+	// + "OUTPUT : Displays all the entries of both the tables. ", response
 	// = "com.arrah.prd.dataquality.Merge")
 	// @ApiErrors({ @ApiError(code = 200, reason = "OK"),
 	// @ApiError(code = 204, reason = "No Content"),
@@ -761,16 +617,7 @@ public class ReportService implements ServiceIfce {
 	// 23.Timeliness information
 	@GET
 	@Path("/timeliness/{table}/{column}/{startdate}/{enddate}")
-	@ApiOperation(value = "Service to get the timeliness information of table data", httpMethod = "GET", notes = "INPUT : Enter the table name and the column name in the database. ", responseClass = "com.arrah.prd.dataquality.Timeliness")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to get the timeliness information of table data", httpMethod = "GET", notes = "INPUT : Enter the table name and the column name in the database. ", response = Timeliness.class)
 	public Response getTime(
 			@ApiParam(value = "Table name to fetch information about timeliness of data", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column in the table that shows the timeliness information", required = true) @PathParam("column") String column,
@@ -792,15 +639,6 @@ public class ReportService implements ServiceIfce {
 	@Path("/tablevolume/{table}")
 	@ApiOperation(value = "Service to find volume by table name", httpMethod = "GET", notes = "PURPOSE : To find the data withheld in a particular table. "
 			+ "OUTPUT : Displays the name of the table and size of data it contains.")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
 	public Response gettableVolume(
 			@ApiParam(value = "Table name to fetch volume information", required = true) @PathParam("table") String table)
 			{try{
@@ -816,18 +654,8 @@ public class ReportService implements ServiceIfce {
 
 	//25. Data Dictionary
 	@GET
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	@Path("/data_dictionary/")
-	@ApiOperation(value = "Service to store data dictionary of a database in PDF format", httpMethod = "GET", responseClass = "com.org.arrah.framework.DataDictionary")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to store data dictionary of a database in PDF format", httpMethod = "GET", response = DataDictionary.class)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response dictionaryPDF(@Context HttpServletResponse servletResponse)
 			{
@@ -850,16 +678,7 @@ public class ReportService implements ServiceIfce {
 	// 26.Load Analysis
 	@GET
 	@Path("/load_analysis/{path}/{table}")
-	@ApiOperation(value = "Service to load bulk data from csv to database", httpMethod = "GET", responseClass = "com.org.arrah.framework.LoadAnalysis")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to load bulk data from csv to database", httpMethod = "GET", response = LoadAnalysis.class)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response loadAnalysis(
 			@ApiParam(value = "File Path from which data is to be loaded.This should contain only data and not the table headers", required = true) @PathParam("path") String path,
@@ -878,16 +697,7 @@ public class ReportService implements ServiceIfce {
 	//27.Delta Table Data
 	@GET
 	@Path("/delta_table_data/{table}/{condn}")
-	@ApiOperation(value = "Service to get table data based on a delta condition", httpMethod = "GET", responseClass = "com.org.arrah.framework.TableDeltaCondn")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to get table data based on a delta condition", httpMethod = "GET", response = TableDeltaCondn.class)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response deltaTableData(
 			@ApiParam(value = "Table name to which data is to be loaded", required = true) @PathParam("table") String table,
@@ -907,16 +717,7 @@ public class ReportService implements ServiceIfce {
 	//28.Schema Comparison
 	@GET
 	@Path("/schema_comparison/")
-	@ApiOperation(value = "Service to get table data based on a delta condition", httpMethod = "GET", responseClass = "com.org.arrah.framework.SchemaComparison")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to get table data based on a delta condition", httpMethod = "GET", response = SchemaComparison.class)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response schemaComparison(
 			@Context HttpServletResponse servletResponse){
@@ -935,16 +736,7 @@ public class ReportService implements ServiceIfce {
 	//29.Table Row Count
 	@GET
 	@Path("/table_row_count/{table}")
-	@ApiOperation(value = "Service to get the number of rows in a table", httpMethod = "GET", responseClass = "com.org.arrah.framework.TblRowCount")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to get the number of rows in a table", httpMethod = "GET", response = TblRowCount.class)
 	public Response getTableRowCount(
 			@ApiParam(value = "Table name for which the number of rows are to be fetched", required = true) @PathParam("table") String table,
 			@Context HttpServletResponse servletResponse)  {
@@ -962,16 +754,7 @@ public class ReportService implements ServiceIfce {
 	//30.String Length Analysis
 	@GET
 	@Path("/string_len_analysis/{table}/{column}")
-	@ApiOperation(value = "Service to perform string analysis on a column of a particular table", httpMethod = "GET", responseClass = "com.org.arrah.framework.StringLenAnalysisWS")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to perform string analysis on a column of a particular table", httpMethod = "GET", response = StringLenAnalysisWS.class)
 	public Response getStringLenAnalysis(
 			@ApiParam(value = "Table name for which the analysis is to be done", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for which the analysis is to be done", required = true) @PathParam("column") String column,
@@ -990,16 +773,7 @@ public class ReportService implements ServiceIfce {
 	//31.Timeliness Analysis
 	@GET
 	@Path("/timeliness_analysis/{table}/{column}")
-	@ApiOperation(value = "Service to perform timeliness analysis on a column of a particular table", httpMethod = "GET", responseClass = "com.org.arrah.framework.TimelinessAnalysisWS")
-	@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-			@ApiError(code = 204, reason = "No Content"),
-			@ApiError(code = 400, reason = "Bad Request"),
-			@ApiError(code = 403, reason = "Forbidden"),
-			@ApiError(code = 404, reason = "Data Not Found"),
-			@ApiError(code = 408, reason = "Request Timeout"),
-			@ApiError(code = 500, reason = "Internal Server Error"),
-			@ApiError(code = 502, reason = "Bad Gateway"),
-			@ApiError(code = 503, reason = "Service Unavailable") })
+	@ApiOperation(value = "Service to perform timeliness analysis on a column of a particular table", httpMethod = "GET", response = TimelinessAnalysisWS.class)
 	public Response getTimelinessAnalysis(
 			@ApiParam(value = "Table name for which the analysis is to be done", required = true) @PathParam("table") String table,
 			@ApiParam(value = "Column name for which the analysis is to be done.This should be of type DATE/TIME/TIMESTAMP", required = true) @PathParam("column") String column,
@@ -1018,16 +792,7 @@ public class ReportService implements ServiceIfce {
 	//32.Create Table
 		@GET
 		@Path("/create_table/{table}/{column}/{needConstraint}/{constraintDesc}")
-		@ApiOperation(value = "Service to create a table", httpMethod = "GET", responseClass = "com.org.arrah.framework.CreateTable")
-		@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-				@ApiError(code = 204, reason = "No Content"),
-				@ApiError(code = 400, reason = "Bad Request"),
-				@ApiError(code = 403, reason = "Forbidden"),
-				@ApiError(code = 404, reason = "Data Not Found"),
-				@ApiError(code = 408, reason = "Request Timeout"),
-				@ApiError(code = 500, reason = "Internal Server Error"),
-				@ApiError(code = 502, reason = "Bad Gateway"),
-				@ApiError(code = 503, reason = "Service Unavailable") })
+		@ApiOperation(value = "Service to create a table", httpMethod = "GET", response = CreateTable.class)
 		public Response createTable(
 				@ApiParam(value = "Table which is to be created", required = true) @PathParam("table") String table,
 				@ApiParam(value = "Column names along with datatype to be given.This follows the convention columnname datatype:columnname1 datatype1 ", required = true) @PathParam("column") String column,
@@ -1048,16 +813,7 @@ public class ReportService implements ServiceIfce {
 		//32.Data Type Meta data
 		@GET
 		@Path("/datatype_metadata_dbms/")
-		@ApiOperation(value = "Service that returns data types supported by a dbms", httpMethod = "GET", responseClass = "com.org.arrah.framework.DataTypeMetadata")
-		@ApiErrors({ @ApiError(code = 200, reason = "OK"),
-						@ApiError(code = 204, reason = "No Content"),
-						@ApiError(code = 400, reason = "Bad Request"),
-						@ApiError(code = 403, reason = "Forbidden"),
-						@ApiError(code = 404, reason = "Data Not Found"),
-						@ApiError(code = 408, reason = "Request Timeout"),
-						@ApiError(code = 500, reason = "Internal Server Error"),
-						@ApiError(code = 502, reason = "Bad Gateway"),
-						@ApiError(code = 503, reason = "Service Unavailable") })
+		@ApiOperation(value = "Service that returns data types supported by a dbms", httpMethod = "GET", response = DataTypeMetadata.class)
 		public Response dataTypeMetaData()  {
 					try{
 					DataTypeMetadata dbType = new DataTypeMetadata(cookieValue);

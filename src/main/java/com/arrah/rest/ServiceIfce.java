@@ -1,4 +1,4 @@
-package com.arrah.dataquality.rest;
+package com.arrah.rest;
 
 import java.io.IOException;
 import java.sql.SQLException;
