@@ -152,6 +152,11 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+  				<groupId>org.eclipse.jetty</groupId>
+  				<artifactId>jetty-maven-plugin</artifactId>
+  				<version>9.3.3.v20150827</version>
+			</plugin>
 		</plugins>
 	</build>
 </project>
