@@ -1,4 +1,4 @@
-package com.arrahtec;
+package com.arrah.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
