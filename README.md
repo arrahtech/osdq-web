@@ -7,9 +7,9 @@
   1. `git clone git@github.com:arrahtec/osdqrest.git`
   2. Update db.connstring src/main/resources/config.properties to point to your database
   3. `mvn package`
-  4. copy osdq.war to your favourite web container like jetty or tomcat
-  5. if you are simply testing, just run `mvn jetty:run` 
-  6. open *http://localhost:8080/osdq/api-explorere*
+  4. Copy osdq.war to your favourite web container like jetty or tomcat
+  5. If you are simply testing, just run `mvn jetty:run` 
+  6. Open *http://localhost:8080/osdq/api-explorere*
 
 
 We are just starting off, gradually we will add additional details at our [wiki] (https://github.com/arrahtec/osdqrest/wiki)
