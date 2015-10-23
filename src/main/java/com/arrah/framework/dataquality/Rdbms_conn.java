@@ -77,7 +77,7 @@ public class Rdbms_conn {
 		try {
 			String s = _d_url;
 			if (s == null || "".equals(s)) {
-			if (_d_type.compareToIgnoreCase("oracle_native") == 0)
+			if (_d_type.compareToIgnoreCase("R") == 0)
 				conn = DriverManager.getConnection(__d_protocol + ":@" + _d_dsn,
 						_d_user, _d_passwd);
 			else {
