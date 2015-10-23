@@ -14,13 +14,12 @@ import io.swagger.annotations.ApiOperation;
 @Api(value = "Auth Service")
 @Path("auth")
 public class AuthService {
-  
- @GET
- @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
- @Path("/tablename/")
- @ApiOperation(value = "Service to get list of table names", httpMethod = "GET", notes = "Displays the names of all the tables in the database")
- public Response getTblName(@Context HttpServletResponse servletResponse) {
-   
- }
 
+  @GET
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Path("/access_token/")
+  @ApiOperation(value = "Service to get access token", httpMethod = "GET", notes = "Returns access tokem upon successful authentication")
+  public Response getAccessToken(@Context HttpServletResponse servletResponse) {
+    return Response.ok("DUMMY_TOKEN").build();
+  }
 }
