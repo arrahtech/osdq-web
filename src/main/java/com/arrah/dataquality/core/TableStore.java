@@ -6,42 +6,46 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.dataquality.util.DBConnectionConfiguration;
+import com.arrah.dataquality.util.DBConnectionUriParser;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
-@XmlRootElement
-@XmlType(propOrder = { "title" })
 public class TableStore {
 
-	private ArrayList<String> title;
-	private String dbstr;
+  private ArrayList<String> tables;
 
-	public TableStore(String dbStr) throws SQLException {
-		dbstr = dbStr;
-		getnames(dbstr);
-	}
+  public TableStore(String dbConnectionURI) throws SQLException {
+    getnames(dbConnectionURI);
+  }
 
-	public TableStore() {
-	}
+  public TableStore() {
+  }
 
-	@XmlElement
-	public ArrayList<String> getTitle() {
-		return title;
-	}
+  @XmlElement
+  public ArrayList<String> getTables() {
+    return tables;
+  }
 
-	private void getnames(String dbStr) throws SQLException {
-		ConnectionString.Connection(dbStr);
-		DatabaseMetaData md = Rdbms_conn.getMetaData();
-		ResultSet resultSet = md.getTables(null, null, null,
-				new String[] { "TABLE" });
-		title = new ArrayList<String>();
-		while (resultSet.next()) {
-			title.add(resultSet.getString("TABLE_NAME"));
-		}
-		resultSet.close();
-		Rdbms_conn.closeConn();
-	}
+  private void getnames(String dbConnectionURI) throws SQLException {
+    // ConnectionString.Connection(dbStr);
+    try {
+      DBConnectionConfiguration dbConnectionConfiguration = DBConnectionUriParser
+          .parse(dbConnectionURI);
+      Rdbms_NewConn conn = new Rdbms_NewConn(dbConnectionConfiguration);
+      conn.openConn();
+      DatabaseMetaData md = conn.getMetaData();
+      ResultSet resultSet = md.getTables(null, null, null,
+          new String[] { "TABLE" });
+      tables = new ArrayList<String>();
+      while (resultSet.next()) {
+        tables.add(resultSet.getString("TABLE_NAME"));
+      }
+      resultSet.close();
+      conn.closeConn();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 }

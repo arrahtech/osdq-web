@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.arrah.dataquality.util.DBConnectionConfiguration;
+
 public class Rdbms_NewConn {
 	private  Connection conn;
 	private  String _d_type = "";
@@ -51,7 +53,25 @@ public class Rdbms_NewConn {
 		
 	}
 
-	public boolean openConn() throws SQLException {
+	/**
+	 * This constructor act like adapter for old constructor.
+	 * @param dbConnectionConfiguration
+	 * @throws SQLException
+	 */
+	public Rdbms_NewConn(DBConnectionConfiguration dbConnectionConfiguration) throws SQLException {
+	
+	    Hashtable<String, String> hashTable = new Hashtable<>();
+	    hashTable.put("Database_Type", dbConnectionConfiguration.getDatabaseType());
+	    hashTable.put("Database_Protocol", dbConnectionConfiguration.getDatabaseProtocol());
+	    hashTable.put("Database_Driver", dbConnectionConfiguration.getJdbcDriver());
+	    hashTable.put("Database_User", dbConnectionConfiguration.getUsername());
+	    hashTable.put("Database_Passwd", dbConnectionConfiguration.getPassword());
+	    hashTable.put("Database_JDBC", dbConnectionConfiguration.getJdbcURL());
+	    init(hashTable);
+	    
+  }
+
+  public boolean openConn() throws SQLException {
 		// Don't open if already opened
 		if (conn != null && conn.isClosed() == false)
 			return true;

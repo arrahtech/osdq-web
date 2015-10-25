@@ -7,9 +7,13 @@ import com.arrah.framework.dataquality.Rdbms_conn;
 
 public class ConnectionString {
 		
+  private final String connectionUri;
 	
-    public ConnectionString() {
+  public ConnectionString(final String connectionUri) {
+    this.connectionUri = connectionUri;
 	}
+  
+  
 
 	public static void Connection(String dbStr) throws SQLException {
 		

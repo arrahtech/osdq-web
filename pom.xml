@@ -28,18 +28,18 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.3.3.v20150827</version>
 				<configuration>
-				  <webApp>
-            <contextPath>/osdq</contextPath>
-          </webApp>
+					<webApp>
+						<contextPath>/osdq</contextPath>
+					</webApp>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
-		  <groupId>io.swagger</groupId>
-		  <artifactId>swagger-jersey-jaxrs</artifactId>
-		  <version>1.5.0</version>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-jersey-jaxrs</artifactId>
+			<version>1.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -140,6 +140,27 @@
 			<artifactId>asm</artifactId>
 			<version>3.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>1.2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>1.2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.stormpath.shiro</groupId>
+			<artifactId>stormpath-shiro-core</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+		<dependency>
+  <groupId>com.stormpath.sdk</groupId>
+  <artifactId>stormpath-sdk-httpclient</artifactId>
+  <version>1.0.RC2</version>
+  <scope>runtime</scope>
+</dependency>
 	</dependencies>
 	<properties>
 		<jersey.version>2.21</jersey.version>
