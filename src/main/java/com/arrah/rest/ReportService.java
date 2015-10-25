@@ -70,7 +70,8 @@ public class ReportService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
 	
-	String cookieValue = DBConfig.dbProperties();
+	//remove this once everything migrated to Rdbms_connnew and URI based connection
+	String cookieValue = "jdbc:mysql://localhost:3306/test";//DBConfig.dbProperties();
 
 	// 1.Get all table names
 	@GET
