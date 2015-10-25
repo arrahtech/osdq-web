@@ -44,7 +44,7 @@ public class ColumnStore {
 
 	private void fillBody(String dbStr) {
 	try{
-		ConnectionString.Connection(dbStr);		
+		//ConnectionString.Connection(dbStr);		
 		DatabaseMetaData metadata = Rdbms_conn.getMetaData();
 		rs = metadata.getColumns(null, null, title, null);
 		header = new ArrayList<String>();

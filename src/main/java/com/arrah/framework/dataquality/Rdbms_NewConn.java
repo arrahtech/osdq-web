@@ -30,43 +30,12 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.arrah.dataquality.util.DBConnectionConfiguration;
+
 public class Rdbms_NewConn {
-  
-  private static class DatabaseDetail {
-    private String databaseType; //("Database_Type", "MYSQL");
-    private String databaseProtocol; //protocol.setText("jdbc:mysql");
-    private String databaseDriver; //driver.setText("com.mysql.jdbc.Driver");
-    
-    public DatabaseDetail(final String databaseType, final String databaseProtocol, final String databaseDriver) {
-      this.databaseType = databaseType;
-      this.databaseProtocol = databaseProtocol;
-      this.databaseDriver = databaseDriver;
-    }
-
-    public String getDatabaseType() {
-      return databaseType;
-    }
-
-    public String getDatabaseProtocol() {
-      return databaseProtocol;
-    }
-
-    public String getDatabaseDriver() {
-      return databaseDriver;
-    }
-  }
-  
-  private static HashMap<String, DatabaseDetail> jdbcDriverMap = new HashMap<String, DatabaseDetail>();
-  
-  static {
-    
-    jdbcDriverMap.put("jdbc:mysql", new DatabaseDetail("mysql", "jdbc:mysql", "com.mysql.jdbc.Driver"));
-  }
-  
 	private  Connection conn;
 	private  String _d_type = "";
 	private  String _d_dsn = "";
@@ -81,17 +50,35 @@ public class Rdbms_NewConn {
 
 	public Rdbms_NewConn(Hashtable<String, String> hashtable) throws SQLException {
 		init(hashtable);
-		openConn();
+		
 	}
 
-	public boolean openConn() throws SQLException {
+	/**
+	 * This constructor act like adapter for old constructor.
+	 * @param dbConnectionConfiguration
+	 * @throws SQLException
+	 */
+	public Rdbms_NewConn(DBConnectionConfiguration dbConnectionConfiguration) throws SQLException {
+	
+	    Hashtable<String, String> hashTable = new Hashtable<>();
+	    hashTable.put("Database_Type", dbConnectionConfiguration.getDatabaseType());
+	    hashTable.put("Database_Protocol", dbConnectionConfiguration.getDatabaseProtocol());
+	    hashTable.put("Database_Driver", dbConnectionConfiguration.getJdbcDriver());
+	    hashTable.put("Database_User", dbConnectionConfiguration.getUsername());
+	    hashTable.put("Database_Passwd", dbConnectionConfiguration.getPassword());
+	    hashTable.put("Database_JDBC", dbConnectionConfiguration.getJdbcURL());
+	    init(hashTable);
+	    
+  }
+
+  public boolean openConn() throws SQLException {
 		// Don't open if already opened
 		if (conn != null && conn.isClosed() == false)
 			return true;
 		if (_d_driver == null || _d_driver.equals("")) {
 			System.out.println("Driver Value Not Found - Check DB Driver field");
 			System.out.println("\n ERROR: Driver Value Not Found");
-			//System.exit(0);
+			System.exit(0);
 		}
 		try {
 			Class.forName(_d_driver);
@@ -275,12 +262,6 @@ public class Rdbms_NewConn {
 		_h = hashtable;
 		table_v = new Vector<String>();
 		tableDesc_v = new Vector<String>();
-		if (_d_url != null) {
-		  //conn = DriverManager.getConnection(_d_url, _d_user, _d_passwd);
-		  _d_type = _d_url.substring(0, _d_url.indexOf(':', 5));
-		  _d_driver = jdbcDriverMap.get(_d_type).getDatabaseDriver();
-		  
-		}
 		exitConn();
 	}
 

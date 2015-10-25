@@ -8,6 +8,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -65,7 +66,7 @@ import io.swagger.annotations.ApiParam;
 
 @Api(value = "Report Service", description = "Suit of reporting APIs")
 @Path("report")
-public class ReportService implements ServiceIfce {
+public class ReportService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReportService.class);
 	
@@ -76,10 +77,10 @@ public class ReportService implements ServiceIfce {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Path("/tablename/")
 	@ApiOperation(value = "Service to get list of table names", httpMethod = "GET", notes = "Displays the names of all the tables in the database")
-	public Response getTblName(@Context HttpServletResponse servletResponse)
+	public Response getTblName(@Context HttpServletResponse servletResponse, @HeaderParam("OSDQ-DBConnectionURI") String dbConnectionURI)
 			 {
 		try{
-			TableStore tbstore = new TableStore(cookieValue);
+			TableStore tbstore = new TableStore(dbConnectionURI);
 		return Response.ok().entity(tbstore).build();
 		}
 		catch(Exception e)
