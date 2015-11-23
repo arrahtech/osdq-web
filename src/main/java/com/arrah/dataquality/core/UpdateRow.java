@@ -8,12 +8,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 public class UpdateRow {
 
-	private String dbstr;
 	private String message;
 	private String table, column, resp;
 	private String columnCond, valueCond;
@@ -24,16 +23,15 @@ public class UpdateRow {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(UpdateRow.class);
 
-	public UpdateRow(String _dbstr, String _table, String _column,
+	public UpdateRow(String dbConnectionURI, String _table, String _column,
 			String _value, String _columnCond, String _valueCond, String _resp) {
-		dbstr = _dbstr;
 		table = _table;
 		column = _column;
 		value = _value;
 		columnCond = _columnCond;
 		valueCond = _valueCond;
 		resp = _resp;
-		updateRec(dbstr, table, column, value, columnCond, valueCond, resp);
+		updateRec(dbConnectionURI, table, column, value, columnCond, valueCond, resp);
 	}
 
 	public UpdateRow() {
@@ -78,17 +76,16 @@ public class UpdateRow {
 	 *            value is "yes" if records are to be updated,"no" otherwise
 	 * @throws SQLException
 	 */
-	public void updateRec(String _dbstr, String _table, String _column,
+	public void updateRec(String dbConnectionURI, String _table, String _column,
 			String _value, String _columnCond, String _valueCond, String resp) {
 		// Execute query based on context parameter
-
+	  Rdbms_NewConn conn = null;
 		try {
-			ConnectionString.Connection(dbstr);
+		  conn = new Rdbms_NewConn(dbConnectionURI);
 			UpdateRowServer rowNum = new UpdateRowServer();
 			if (resp.equalsIgnoreCase("yes") || resp.equalsIgnoreCase("y")) {
-
 				try {
-					rowUpdate = rowNum.updateRecord(_table, _column, _value,
+					rowUpdate = rowNum.updateRecord(conn, _table, _column, _value,
 							_columnCond, _valueCond, resp);
 					setMessage("Query Executed successfully !! " + rowUpdate
 							+ " rows affected");
@@ -106,7 +103,7 @@ public class UpdateRow {
 			e.getLocalizedMessage();
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+				conn.closeConn();
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}

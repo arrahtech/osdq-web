@@ -2,7 +2,7 @@ package com.arrah.dataquality.core;
 
 import java.sql.SQLException;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 public class UpdateRowServer {
 	/**
@@ -24,30 +24,22 @@ public class UpdateRowServer {
 	 *            value is "yes" if records are to be updated,"no" otherwise
 	 * @throws SQLException
 	 */
-	public int updateRecord(String _table, String _column, String value,
+	public int updateRecord(Rdbms_NewConn conn, String _table, String _column, String value,
 			String _columnCond, String _valueCond, String resp) {
 		try {
-			String dbType = Rdbms_conn.getDBType();
-			String dsn = Rdbms_conn.getHValue("Database_DSN");
 			String updateQuery = "";
-			QueryBuilder stats = new QueryBuilder(dsn, _table, _column, dbType);
-			QueryBuilder.setCond(_columnCond + " = " + _valueCond);
+			QueryBuilder stats = new QueryBuilder(conn, _table, _column);
+			stats.setCond(_columnCond + " = " + _valueCond);
 			updateQuery = stats.getUpdateRowQuery(value);
 			// Execute query based on context parameter
 			if (resp.equalsIgnoreCase("yes") || resp.equalsIgnoreCase("y")) {
-				return Rdbms_conn.executeUpdate(updateQuery);
+				return conn.executeUpdate(updateQuery);
 			} else {
 				return 0;
 			}
 		} catch (Exception e) {
 			e.getLocalizedMessage();
 			return -1;
-		} finally {
-			try {
-				Rdbms_conn.closeConn();
-			} catch (Exception e) {
-				e.getLocalizedMessage();
-			}
 		}
 	}
 }

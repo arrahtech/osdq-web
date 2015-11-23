@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
+
 @XmlRootElement
 @XmlType(propOrder = { "smplSize", "minimum", "maximum", "range", "sum", "mod",
 		"median", "average", "absDeviation", "variance", "kurtosis",
@@ -175,10 +177,11 @@ public class VolumeCount {
 
 		table = tableName;
 		column = columnName;
-
+		Rdbms_NewConn conn = null;
 		try {
-			ConnectionString.Connection(dbStr);
-			double values[] = VolumeCountServer.getVolumeCountValues(tableName,
+		  conn = new Rdbms_NewConn(dbStr);
+		  VolumeCountServer volumeCountServer = new VolumeCountServer(conn);
+			double values[] = volumeCountServer.getVolumeCountValues(tableName,
 					columnName, start, end);
 
 			average = values[0];
@@ -204,9 +207,12 @@ public class VolumeCount {
 			midRange3565 = values[20];
 			midRange4060 = values[21];
 
-		} catch (NullPointerException e) {
-			
+		} catch (Exception e) {
 			LOGGER.error(e.getLocalizedMessage());
+		} finally {
+		  if (conn != null) {
+		    conn.closeConn();
+		  }
 		}
 
 	}

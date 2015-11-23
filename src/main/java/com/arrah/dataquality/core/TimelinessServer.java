@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 import com.arrah.framework.dataquality.SqlType;
@@ -26,8 +26,6 @@ public class TimelinessServer {
 	 * 
 	 * <p>
 	 * 
-	 * @param dbstr
-	 *            database connection string <br/>
 	 * @param tableName
 	 *            name of the table for which timeliness information is to be
 	 *            fetched <br/>
@@ -40,20 +38,19 @@ public class TimelinessServer {
 	 *            </p>
 	 */
 
-	public static String[] getTimelinessValues(String tableName,
+	public static String[] getTimelinessValues(Rdbms_NewConn conn, String tableName,
 			String columnName, String start, String end) {
 
 		String latestDate = null, firstDate = null, modDate = null, medianDate = null, smplSize = null, avg = null, absDev = null, varinc = null, kurtosis = null, skewness = null, midRange199 = null, midRange595 = null, midRange1090 = null, midRange1585 = null, midRange2080 = null, midRange2575 = null, midRange3070 = null, midRange3565 = null, midRange4060 = null;
 		DateFormat formatter = null;
 
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder stats = new QueryBuilder(dsn, tableName, columnName,
-				Rdbms_conn.getDBType());
+		String dbType = conn.getDBType();
+		String dsn = conn.getHValue("Database_DSN");
+		QueryBuilder stats = new QueryBuilder(conn, tableName, columnName);
 		DatabaseMetaData metadata=null;
 		ResultSet resultSet=null;
 		try {
-			metadata = Rdbms_conn.getMetaData();
+			metadata = conn.getMetaData();
 			resultSet = metadata.getColumns(null, null, tableName, null);
 			while (resultSet.next()) {
 				if (columnName.equalsIgnoreCase(resultSet
@@ -93,12 +90,13 @@ public class TimelinessServer {
 							query += end + "#";
 						}
 						/* Setting WHERE clause */
-						QueryBuilder.setCond(query);
+						stats.setCond(query);
 						String volume_count = stats.bottomQuery(false,
 								"colName", "100000");
-						ResultSet resultset = Rdbms_conn.runQuery(volume_count);
+						ResultSet resultset = conn.runQuery(volume_count);
 						if (resultset != null) {
-							ReportTableModel rtm = ResultsetToRTM.getSQLValue(
+						  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+							ReportTableModel rtm = resultsetToRTM.getSQLValue(
 									resultset, true);
 							int rowc = rtm.getModel().getRowCount();
 							if (rowc != 0) {
@@ -248,7 +246,7 @@ public class TimelinessServer {
 							throw new NullPointerException();
 						}
 						resultset.close();
-						Rdbms_conn.closeConn();
+						conn.closeConn();
 					}
 				}
 			}
@@ -258,7 +256,7 @@ public class TimelinessServer {
 		finally{
 			try{
 			resultSet.close();
-			Rdbms_conn.closeConn();
+			conn.closeConn();
 			}
 			catch(Exception e){
 				e.getLocalizedMessage();

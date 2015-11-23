@@ -10,21 +10,22 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.itextpdf.text.DocumentException;
 
 @XmlRootElement
 @XmlType(propOrder = { "message" })
 public class DataDictionary {
 
-	String dbstr, message = "";
+	String dbStr, message = "";
 	OutputStream output;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DataDictionary.class);
 
 	public DataDictionary(String _dbstr, OutputStream _output)
 			throws SQLException, DocumentException {
-		dbstr = _dbstr;
 		output = _output;
+		dbStr = _dbstr;
 		createPDF();
 	}
 
@@ -48,9 +49,10 @@ public class DataDictionary {
 	 */
 
 	public void createPDF() {
-		try {
-			ConnectionString.Connection(dbstr);
-			DataDictionaryServer.createDataDictionary(output);
+		Rdbms_NewConn conn;
+	  try {
+	    conn = new Rdbms_NewConn(dbStr);
+			DataDictionaryServer.createDataDictionary(conn, output);
 			setMessage("Data dictionary created successfully");
 		} catch (Exception e) {
 			LOGGER.error("Error in creating data dictionary", e);

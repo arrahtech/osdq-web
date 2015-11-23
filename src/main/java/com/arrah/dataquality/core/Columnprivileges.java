@@ -1,5 +1,7 @@
 package com.arrah.dataquality.core;
 
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 
 
@@ -17,8 +19,7 @@ import com.arrah.framework.dataquality.ReportTableModel;
 @XmlType(propOrder = { "title", "header", "body", "column" })
 public class Columnprivileges {
 
-	private String title;
-	private String dbstr;
+	private String table;
 	private String column;
 	private ArrayList<Row> body;
 	private ArrayList<String> header;
@@ -26,19 +27,29 @@ public class Columnprivileges {
 	private static final Logger LOGGER = LoggerFactory.
 			getLogger(Columnprivileges.class);
 
-	public Columnprivileges(String tableName, String columnName, String dbStr) {
+	public Columnprivileges(String tableName, String columnName, String dbConnectionURI) {
 		column = columnName;
-		title = tableName;
-		dbstr = dbStr;
-		fillBody(dbstr);
+		table = tableName;
+		try {
+      Rdbms_NewConn conn = new Rdbms_NewConn(dbConnectionURI);
+      conn.openConn();
+      fillBody(conn);
+      conn.closeConn();
+    } catch (URISyntaxException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 	}
 
 	public Columnprivileges() {
 	}
 
 	@XmlElement
-	public String getTitle() {
-		return title;
+	public String getTable() {
+		return table;
 	}
 
 	@XmlElement
@@ -56,11 +67,10 @@ public class Columnprivileges {
 		return header;
 	}
 
-	private void fillBody(String dbStr) {
-	try{
-		ConnectionString.Connection(dbStr);		
-		String tbPattern = title.concat("/").concat(column);
-		DBMetaInfo _dbm = new DBMetaInfo();
+	private void fillBody(Rdbms_NewConn conn) {
+	  try{
+		String tbPattern = table.concat("/").concat(column);
+		DBMetaInfo _dbm = new DBMetaInfo(conn);
 		ReportTableModel rtm = _dbm.getColumnPrivilege(tbPattern);
 
 		int colc = rtm.getModel().getColumnCount();
@@ -88,7 +98,7 @@ public class Columnprivileges {
 	}
 	finally{
 		try {
-			Rdbms_conn.closeConn();
+			conn.closeConn();
 		} catch (Exception e) {
 			LOGGER.error("Error in closing connection", e);
 		}

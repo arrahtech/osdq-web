@@ -2,7 +2,7 @@ package com.arrah.dataquality.core;
 
 import java.sql.ResultSet;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 public class DeleteRowServer {
 	/**
@@ -13,7 +13,7 @@ public class DeleteRowServer {
 	 * as a part of the conditional clause to delete the specified record.
 	 * <p>
 	 * 
-	 * @param _dbstr
+	 * @param conn
 	 *            database connection string <br/>
 	 * @param _table
 	 *            table from which the record is to be deleted <br/>
@@ -23,31 +23,26 @@ public class DeleteRowServer {
 	 *            condition based on which record is to be deleted. *
 	 *            </p>
 	 */
-	public static void deleteRecord(String _dbstr, String _table,
+	public static void deleteRecord(Rdbms_NewConn conn, String _table,
 			String _column, Object value) {
 		ResultSet resultset = null;
 
 		try {
-			ConnectionString.Connection(_dbstr);
-			QueryBuilder queryDB = new QueryBuilder(
-					Rdbms_conn.getHValue("Database_DSN"), _table,
-					Rdbms_conn.getDBType());
-			QueryBuilder.setCond(_column + "=" + value);
+			QueryBuilder queryDB = new QueryBuilder(conn, _table);
+			queryDB.setCond(_column + "=" + value);
 			String deleteQuery = queryDB.getDeleteRowQuery();
 
 			// Execute query based on context parameter
-			resultset = Rdbms_conn.execute(deleteQuery);
+			resultset = conn.execute(deleteQuery);
 		} catch (Exception e) {
 			e.getLocalizedMessage();
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
 				resultset.close();
 			} catch (Exception e) {
 				e.getMessage();
 			}
 		}
-
 	}
 
 }

@@ -10,13 +10,13 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 
 @XmlRootElement
 @XmlType(propOrder = { "header", "body" })
 public class TableDeltaCondn {
-	private String condn, dbstr = "", table = "";
+	private String condn, table = "";
 	private ArrayList<String> header;
 	private ArrayList<Row> body;
 
@@ -28,9 +28,8 @@ public class TableDeltaCondn {
 	public TableDeltaCondn(String _dbstr, String _table, String _condn)
 			throws SQLException {
 		condn = _condn;
-		dbstr = _dbstr;
 		table = _table;
-		deltaTableData(dbstr, table, condn);
+		deltaTableData(_dbstr, table, condn);
 	}
 
 	@XmlElement
@@ -52,17 +51,21 @@ public class TableDeltaCondn {
 	 * @param condn2 delta/ condition based on which table data is to be fetched
 	 */
 	private void deltaTableData(String dbstr2, String table2, String condn2) {
-		try {
-			ConnectionString.Connection(dbstr);
-			TableDeltaDataServer.deltaTableData(table, condn);
-			header = TableDeltaDataServer.getHeader();
-			body = TableDeltaDataServer.getBody();
+		Rdbms_NewConn conn = null;
+	  try {
+	    conn = new Rdbms_NewConn(dbstr2);
+	    TableDeltaDataServer tableDeltaDataServer = new TableDeltaDataServer();
+	    tableDeltaDataServer.deltaTableData(conn, table, condn);
+			header = tableDeltaDataServer.getHeader();
+			body = tableDeltaDataServer.getBody();
 		} catch (Exception se) {
 			LOGGER.error("Error in getting table data", se);
 		}
 		finally{
 			try {
-				Rdbms_conn.closeConn();
+			  if (conn != null) {
+			    conn.closeConn();
+			  }
 			} catch (Exception e) {
 				LOGGER.error("Error in closing connection", e);
 			}

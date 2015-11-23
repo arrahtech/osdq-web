@@ -28,23 +28,27 @@ import com.arrah.dataquality.core.FillCheck;
 public class TableFirstInformation {
 	private Vector<Double> patV ;
 	
+	private Rdbms_NewConn conn;
+	public TableFirstInformation(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
+	
 	public double getTableCount(String tableName) {
 		
 	double tabCount = 0;
 	String countS = "0";
 
-	QueryBuilder querybuilder = new QueryBuilder(Rdbms_conn.getHValue("Database_DSN"), tableName,
-			Rdbms_conn.getHValue("Database_Type"));
+	QueryBuilder querybuilder = new QueryBuilder(conn, tableName);
 	try {
-	Rdbms_conn.openConn();
+	conn.openConn();
 	String s2 = querybuilder.get_tableCount_query();
 	
-	for (ResultSet resultset1 = Rdbms_conn.runQuery(s2); resultset1
+	for (ResultSet resultset1 = conn.runQuery(s2); resultset1
 			.next(); )
 		countS = resultset1.getString("row_count");
 	
 	tabCount = Double.parseDouble(countS);
-	Rdbms_conn.closeConn();
+	conn.closeConn();
 	
 	} catch (SQLException e) {
 		ConsoleFrame.addText("\n Table Count Sql Error :"+ e.getMessage());
@@ -56,15 +60,13 @@ public class TableFirstInformation {
 		double patCount= 0;
 		patV = new Vector<Double> ();
 		
-		QueryBuilder querybuilder = new QueryBuilder(Rdbms_conn.getHValue("Database_DSN"), tableName,
-				Rdbms_conn.getHValue("Database_Type"));
+		QueryBuilder querybuilder = new QueryBuilder(conn, tableName);
 		try {
 		@SuppressWarnings("rawtypes")
-		Vector[] avector = Rdbms_conn.populateColumn(tableName, null);
-		Rdbms_conn.openConn();
+		Vector[] avector = conn.populateColumn(tableName, null);
 		String s2 = querybuilder.get_table_duprow_query(avector[0],"");
 		
-		ResultSet resultset1 = Rdbms_conn.runQuery(s2);
+		ResultSet resultset1 = conn.runQuery(s2);
 		if (resultset1 == null ) {
 			ConsoleFrame.addText  ("resultset null for Pattern query");
 			return patCount;
@@ -75,7 +77,6 @@ public class TableFirstInformation {
 		patV.add(patternC);
 		patCount++;
 		}
-		Rdbms_conn.closeConn();
 		
 		} catch (Exception e) {
 			ConsoleFrame.addText("Table Pattern Sql Error :"+ e.getMessage());
@@ -117,15 +118,14 @@ public class TableFirstInformation {
 	public int[] getTableFill(String tableName) {
 		int[] emptyCount = null;
 		
-		QueryBuilder querybuilder = new QueryBuilder(Rdbms_conn.getHValue("Database_DSN"), tableName,
-				Rdbms_conn.getHValue("Database_Type"));
+		QueryBuilder querybuilder = new QueryBuilder(conn, tableName
+				);
 		try {
-			Rdbms_conn.openConn();
 			String s2 = querybuilder.get_tableAll_query();
-			ResultSet resultset1 = Rdbms_conn.runQuery(s2);
-			ReportTableModel rtm = ResultsetToRTM.getSQLValue(resultset1, true);
+			ResultSet resultset1 = conn.runQuery(s2);
+			ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			ReportTableModel rtm = resultsetToRTM.getSQLValue(resultset1, true);
 			emptyCount = FillCheck.getEmptyCount(rtm);
-			Rdbms_conn.closeConn();
 			return emptyCount;
 			
 			} catch (SQLException e) {

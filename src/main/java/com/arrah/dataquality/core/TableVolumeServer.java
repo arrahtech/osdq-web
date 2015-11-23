@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
@@ -20,20 +20,20 @@ public class TableVolumeServer {
 	 * </p>
 	 */
 	@SuppressWarnings({ "rawtypes" })
-	public static ArrayList[] getTableVolumeValues(String table)
+	public static ArrayList[] getTableVolumeValues(Rdbms_NewConn conn, String table)
 			throws SQLException {
 
 		ArrayList<String> header = null;
 		ArrayList<Row> body = null;
 		
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder stats = new QueryBuilder(dsn, table, dbType);
+		String dbType = conn.getDBType();
+		QueryBuilder stats = new QueryBuilder(conn, table);
 		String volume_query = stats.getTableVolumeQuery();
 
-		ResultSet resultset = Rdbms_conn.runQuery(volume_query);
+		ResultSet resultset = conn.runQuery(volume_query);
 		if (resultset != null) {
-			ReportTableModel rtm = ResultsetToRTM.getSQLValue(resultset, true);
+		  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			ReportTableModel rtm = resultsetToRTM.getSQLValue(resultset, true);
 			int rowc = rtm.getModel().getRowCount();
 			int colc = rtm.getModel().getColumnCount();
 			header = new ArrayList<String>();
@@ -69,7 +69,6 @@ public class TableVolumeServer {
 			throw new NullPointerException();
 		}
 		resultset.close();
-		Rdbms_conn.closeConn();
 		return new ArrayList[] { header, body };
 	}
 

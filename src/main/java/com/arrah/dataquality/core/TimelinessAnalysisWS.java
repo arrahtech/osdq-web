@@ -8,16 +8,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
-@XmlRootElement(name="TimelinessAnalysis")
+@XmlRootElement(name="timelinessAnalysis")
 public class TimelinessAnalysisWS {
 	
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(StringLenAnalysisWS.class);
 	
 	private String  _table, _col;
-	String dbstr;
 	@XmlElement(name="FreqAnalysis")
 	ArrayList<String> freqHeader;
 	@XmlElement(name="VariationAnalysis")
@@ -39,20 +38,21 @@ public class TimelinessAnalysisWS {
 	public TimelinessAnalysisWS(String dbStr,String tableName, String columnName) {
 		_col = columnName;
 		_table = tableName;
-		dbstr = dbStr;
-		getDataforTimeAnalysis();
+		getDataforTimeAnalysis(dbStr);
 	}
 	
-	private void getDataforTimeAnalysis() {
-		try{
-			ConnectionString.Connection(dbstr);
-			TimelinessAnalysis.getDataforAnalysis(_table,_col);
-			freqHeader=TimelinessAnalysis.getFreqHeader();
-			freqData=TimelinessAnalysis.getFreqData();
-			varHeader=TimelinessAnalysis.getVarHeader();
-			varData=TimelinessAnalysis.getVarData();
-			percentHeader=TimelinessAnalysis.getPercentHeader();
-			percentData=TimelinessAnalysis.getPercentData();
+	private void getDataforTimeAnalysis(String dbStr) {
+		Rdbms_NewConn conn = null;
+	  try{
+	    conn = new Rdbms_NewConn(dbStr);
+	    TimelinessAnalysis timelinessAnalysis = new TimelinessAnalysis(conn);
+			timelinessAnalysis.getDataforAnalysis(_table,_col);
+			freqHeader=timelinessAnalysis.getFreqHeader();
+			freqData=timelinessAnalysis.getFreqData();
+			varHeader=timelinessAnalysis.getVarHeader();
+			varData=timelinessAnalysis.getVarData();
+			percentHeader=timelinessAnalysis.getPercentHeader();
+			percentData=timelinessAnalysis.getPercentData();
 			
 		}
 		catch(Exception e){
@@ -60,7 +60,9 @@ public class TimelinessAnalysisWS {
 		}
 		finally{
 			try{
-				Rdbms_conn.closeConn();
+			  if (conn != null) {
+			    conn.closeConn();
+			  }
 			}
 			catch(Exception e){
 				LOGGER.error("Error in closing connection", e);

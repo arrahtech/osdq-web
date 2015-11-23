@@ -35,41 +35,46 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class DataDictionaryPDF {
 	private Vector<String> _tableN = new Vector<String>();
 	
-	public DataDictionaryPDF() {
-		_tableN = Rdbms_conn.getTable();
+	private Rdbms_NewConn conn = null;
+	private TableMetaInfo tableMetaInfo = null;
+	
+	public DataDictionaryPDF(Rdbms_NewConn conn) {
+		_tableN = conn.getTable();
+		this.conn = conn;
+		this.tableMetaInfo = new TableMetaInfo(conn);
 	}
 	
 	public PdfPTable getTableMetaData(int tabIndex) {
 		ReportTableModel reporttable = null; 
-		reporttable = TableMetaInfo.populateTable(2, tabIndex, tabIndex+1, reporttable);
+		reporttable = tableMetaInfo.populateTable(2, tabIndex, tabIndex+1, reporttable);
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;
 	}
 	
 	public PdfPTable getTableData(int tabIndex) {
 		ReportTableModel reporttable = null; 
-		reporttable = TableMetaInfo.populateTable(4, tabIndex, tabIndex+1, reporttable);
+		reporttable = tableMetaInfo.populateTable(4, tabIndex, tabIndex+1, reporttable);
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;
 	}
 	
 	public PdfPTable getTableIndex(int tabIndex) {
 		ReportTableModel reporttable = null; 
-		reporttable = TableMetaInfo.populateTable(1, tabIndex, tabIndex+1, reporttable);
+		reporttable = tableMetaInfo.populateTable(1, tabIndex, tabIndex+1, reporttable);
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;
 	}
 	
 	public PdfPTable getTableKey(String table) throws SQLException {
 		ReportTableModel reporttable = null; 
-		reporttable = TableMetaInfo.tableKeyInfo(table);
+		reporttable = tableMetaInfo.tableKeyInfo(table);
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;
 	}
 	
 	public PdfPTable getDBParameter() throws SQLException {
 		ReportTableModel reporttable = null; 
-		DBMetaInfo dbmeta = new DBMetaInfo();
+		DBMetaInfo dbmeta = new DBMetaInfo(conn);
 		reporttable = dbmeta.getParameterInfo();
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;
@@ -77,7 +82,7 @@ public class DataDictionaryPDF {
 	
 	public PdfPTable getDBProcedure() throws SQLException {
 		ReportTableModel reporttable = null; 
-		DBMetaInfo dbmeta = new DBMetaInfo();
+		DBMetaInfo dbmeta = new DBMetaInfo(conn);
 		reporttable = dbmeta.getProcedureInfo();
 		PdfPTable pdfTable = RTMUtil.createPDFTable(reporttable);
 		return pdfTable;

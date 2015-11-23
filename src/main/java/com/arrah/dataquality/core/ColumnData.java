@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
@@ -20,18 +20,15 @@ import com.arrah.framework.dataquality.ResultsetToRTM;
 public class ColumnData {
 
 	private String title;
-	private String dbstr;
 	private String header;
 	private ArrayList<String> body;
-	ResultSet resultset = null;
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ColumnData.class);
 
-	public ColumnData(String tableName, String columnName, String dbStr) {
+	public ColumnData(String tableName, String columnName, String dbConnectionURI) {
 		header = columnName;
 		title = tableName;
-		dbstr = dbStr;
-		fillBody(dbstr);
+		fillBody(dbConnectionURI);
 	}
 
 	public ColumnData() {
@@ -52,16 +49,18 @@ public class ColumnData {
 		return body;
 	}
 
-	private void fillBody(String dbStr) {
-		try {
-			ConnectionString.Connection(dbStr);
-			String dbType = Rdbms_conn.getDBType();
-			String dsn = Rdbms_conn.getHValue("Database_DSN");
-			QueryBuilder tableQb = new QueryBuilder(dsn, title, dbType);
+	private void fillBody(String dbConnectionURI) {
+	  Rdbms_NewConn conn = null;
+	  ResultSet resultset = null;
+	  try {
+	    conn = new Rdbms_NewConn(dbConnectionURI);
+	    conn.openConn();
+			QueryBuilder tableQb = new QueryBuilder(conn, title);
 
 			String s1 = tableQb.getTableAllQuery();
-			resultset = Rdbms_conn.runQuery(s1);
-			ReportTableModel rtm = ResultsetToRTM.getSQLValue(resultset, true);
+			resultset = conn.runQuery(s1);
+			ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			ReportTableModel rtm = resultsetToRTM.getSQLValue(resultset, true);
 
 			int rowc = rtm.getModel().getRowCount();
 			int colc = rtm.getModel().getColumnCount();
@@ -84,11 +83,9 @@ public class ColumnData {
 		} finally {
 			try {
 				resultset.close();
-				Rdbms_conn.closeConn();
 			} catch (Exception e) {
 				LOGGER.error("Error in closing connection", e);
 			}
-
 		}
 	}
 }

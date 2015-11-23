@@ -14,29 +14,30 @@ import java.util.Vector;
 
 import com.arrah.framework.dataquality.ConsoleFrame;
 import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 public class TableFirstInformation {
 	private Vector<Double> patV;
+	private Rdbms_NewConn conn;
 
+	public TableFirstInformation(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
+	
 	public double getTableCount(String tableName) {
 
 		double tabCount = 0;
 		String countS = "0";
 
-		QueryBuilder querybuilder = new QueryBuilder(
-				Rdbms_conn.getHValue("Database_DSN"), tableName,
-				Rdbms_conn.getHValue("Database_Type"));
+		QueryBuilder querybuilder = new QueryBuilder(conn, tableName);
 		try {
-			Rdbms_conn.openConn();
 			String s2 = querybuilder.get_tableCount_query();
 
-			for (ResultSet resultset1 = Rdbms_conn.runQuery(s2, 6000); resultset1
+			for (ResultSet resultset1 = conn.runQuery(s2, 6000); resultset1
 					.next();)
 				countS = resultset1.getString("row_count");
 
 			tabCount = Double.parseDouble(countS);
-			Rdbms_conn.closeConn();
 
 		} catch (SQLException e) {
 			ConsoleFrame.addText("Table Count Sql Error :" + e.getMessage());
@@ -49,15 +50,14 @@ public class TableFirstInformation {
 		patV = new Vector<Double>();
 
 		QueryBuilder querybuilder = new QueryBuilder(
-				Rdbms_conn.getHValue("Database_DSN"), tableName,
-				Rdbms_conn.getHValue("Database_Type"));
+				conn, tableName);
 		try {
 			@SuppressWarnings("rawtypes")
-			Vector[] avector = Rdbms_conn.populateColumn(tableName, null);
-			Rdbms_conn.openConn();
+			Vector[] avector = conn.populateColumn(tableName, null);
+			conn.openConn();
 			String s2 = querybuilder.get_table_duprow_query(avector[0], "");
 
-			ResultSet resultset1 = Rdbms_conn.runQuery(s2);
+			ResultSet resultset1 = conn.runQuery(s2);
 			if (resultset1 == null) {
 				ConsoleFrame.addText("resultset null for Pattern query");
 				return patCount;
@@ -68,7 +68,6 @@ public class TableFirstInformation {
 				patV.add(patternC);
 				patCount++;
 			}
-			Rdbms_conn.closeConn();
 
 		} catch (Exception e) {
 			ConsoleFrame.addText("Table Pattern Sql Error :" + e.getMessage());

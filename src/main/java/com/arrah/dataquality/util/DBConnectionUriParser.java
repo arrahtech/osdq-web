@@ -16,12 +16,30 @@ public class DBConnectionUriParser {
 
   private static HashMap<String, String[]> uriScheme2ProtocolDriverMapping = new HashMap<>(
       1);
+  
 
   /**
    * Add all the mapping from scheme to jdbc-scheme
    */
   static {
+    uriScheme2ProtocolDriverMapping.put("oracle", new String[] {"jdbc:oracle:native", "oracle.jdbc.OracleDriver"});
+    uriScheme2ProtocolDriverMapping.put("splice", new String[] {"jdbc:derby", "org.apache.derby.jdbc.ClientDriver"});
     uriScheme2ProtocolDriverMapping.put("mysql", new String[] {"jdbc:mysql", "com.mysql.jdbc.Driver"});
+    uriScheme2ProtocolDriverMapping.put("informix", new String[] {"jdbc:informix-sqli", "com.informix.jdbc.IfxDriver"});
+    uriScheme2ProtocolDriverMapping.put("hive2", new String[] {"jdbc:hive2", "org.apache.hive.jdbc.HiveDriver"});
+    uriScheme2ProtocolDriverMapping.put("hive", new String[] {"jdbc:hive", "org.apache.hadoop.hive.jdbc.HiveDriver"});
+    uriScheme2ProtocolDriverMapping.put("db2", new String[] {"jdbc:db2", "com.ibm.db2.jcc.DB2Driver"});
+    uriScheme2ProtocolDriverMapping.put("postgresql", new String[] {"jdbc:postgresql", "org.postgresql.Driver"});
+    uriScheme2ProtocolDriverMapping.put("ucanaccess", new String[] {"jdbc:ucanaccess", "net.ucanaccess.jdbc.UcanaccessDriver"});
+    uriScheme2ProtocolDriverMapping.put("sqlserver", new String[] {"jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"});
+
+    /* In server mode, do we need odbc? I think, No!!
+     * 
+    uriScheme2ProtocolDriverMapping.put("mysql-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+    uriScheme2ProtocolDriverMapping.put("msaccess-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+    uriScheme2ProtocolDriverMapping.put("sqlserver-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+    uriScheme2ProtocolDriverMapping.put("oracle-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+     */
   }
 
   public static DBConnectionConfiguration parse(final String dbConnectionURI)

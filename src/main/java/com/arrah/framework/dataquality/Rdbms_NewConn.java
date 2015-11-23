@@ -1,5 +1,7 @@
 package com.arrah.framework.dataquality;
 
+import java.net.URISyntaxException;
+
 /***********************************************
  *     Copyright to Vivek Kumar Singh          *
  *                                             *
@@ -34,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import com.arrah.dataquality.util.DBConnectionConfiguration;
+import com.arrah.dataquality.util.DBConnectionUriParser;
 
 public class Rdbms_NewConn {
 	private  Connection conn;
@@ -50,7 +53,6 @@ public class Rdbms_NewConn {
 
 	public Rdbms_NewConn(Hashtable<String, String> hashtable) throws SQLException {
 		init(hashtable);
-		
 	}
 
 	/**
@@ -60,16 +62,15 @@ public class Rdbms_NewConn {
 	 */
 	public Rdbms_NewConn(DBConnectionConfiguration dbConnectionConfiguration) throws SQLException {
 	
-	    Hashtable<String, String> hashTable = new Hashtable<>();
-	    hashTable.put("Database_Type", dbConnectionConfiguration.getDatabaseType());
-	    hashTable.put("Database_Protocol", dbConnectionConfiguration.getDatabaseProtocol());
-	    hashTable.put("Database_Driver", dbConnectionConfiguration.getJdbcDriver());
-	    hashTable.put("Database_User", dbConnectionConfiguration.getUsername());
-	    hashTable.put("Database_Passwd", dbConnectionConfiguration.getPassword());
-	    hashTable.put("Database_JDBC", dbConnectionConfiguration.getJdbcURL());
-	    init(hashTable);
+
 	    
   }
+	
+	public Rdbms_NewConn(String dbConnectionURI) throws URISyntaxException, SQLException {
+	  DBConnectionConfiguration dbConnectionConfiguration = DBConnectionUriParser
+        .parse(dbConnectionURI);
+	  init(dbConnectionConfiguration);
+	}
 
   public boolean openConn() throws SQLException {
 		// Don't open if already opened
@@ -78,7 +79,7 @@ public class Rdbms_NewConn {
 		if (_d_driver == null || _d_driver.equals("")) {
 			System.out.println("Driver Value Not Found - Check DB Driver field");
 			System.out.println("\n ERROR: Driver Value Not Found");
-			System.exit(0);
+			//System.exit(0);
 		}
 		try {
 			Class.forName(_d_driver);
@@ -171,7 +172,8 @@ public class Rdbms_NewConn {
 			return resultset;
 		} else {
 			PreparedStatement preparedstatement = conn.prepareStatement(s);
-			Vector<?>[] dateVar = QueryBuilder.getDateCondition();
+			QueryBuilder queryBuilder = new QueryBuilder(this);
+			Vector<?>[] dateVar = queryBuilder.getDateCondition();
 			for (int i = 0; i < dateVar[0].size(); i++) {
 				String s1 = (String) dateVar[1].get(i);
 				if (s1.compareToIgnoreCase("time") == 0)
@@ -249,6 +251,17 @@ public class Rdbms_NewConn {
 		else
 			return null;
 	}
+	
+	private void init(DBConnectionConfiguration dbConnectionConfiguration) throws SQLException {
+    Hashtable<String, String> hashTable = new Hashtable<>();
+    hashTable.put("Database_Type", dbConnectionConfiguration.getDatabaseType());
+    hashTable.put("Database_Protocol", dbConnectionConfiguration.getDatabaseProtocol());
+    hashTable.put("Database_Driver", dbConnectionConfiguration.getJdbcDriver());
+    hashTable.put("Database_User", dbConnectionConfiguration.getUsername());
+    hashTable.put("Database_Passwd", dbConnectionConfiguration.getPassword());
+    hashTable.put("Database_JDBC", dbConnectionConfiguration.getJdbcURL());
+    init(hashTable);
+	}
 
 	private void init(Hashtable<String, String> hashtable)
 			throws SQLException {
@@ -263,6 +276,10 @@ public class Rdbms_NewConn {
 		table_v = new Vector<String>();
 		tableDesc_v = new Vector<String>();
 		exitConn();
+	}
+	
+	public String getDSN() {
+	  return _d_dsn;
 	}
 
 	public  String getDBType() {

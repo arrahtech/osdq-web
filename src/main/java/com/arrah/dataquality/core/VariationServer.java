@@ -3,7 +3,7 @@ package com.arrah.dataquality.core;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
@@ -24,19 +24,18 @@ public class VariationServer {
 	 * </p>
 	 */
 	
-	public static double[] getVariationValues(String tableName,
+	public static double[] getVariationValues(Rdbms_NewConn conn, String tableName,
 			String columnName) throws SQLException {
 
 		double smplSize = 0.0D, avg = 0.0D, maxm = 0.0D, minm = 0.0D, sum = 0.0D, range = 0.0D;
 		
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder var = new QueryBuilder(dsn, tableName, columnName, dbType);
+		QueryBuilder var = new QueryBuilder(conn, tableName, columnName);
 		String aggr_query = var.aggrQuery("5YYYYY", 0, "0", "0");
 
-		ResultSet resultSet = Rdbms_conn.runQuery(aggr_query);
+		ResultSet resultSet = conn.runQuery(aggr_query);
 		if (resultSet != null) {
-			ReportTableModel rtm = ResultsetToRTM.getSQLValue(resultSet, true);
+		  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			ReportTableModel rtm = resultsetToRTM.getSQLValue(resultSet, true);
 			smplSize = Double.parseDouble(rtm.getModel().getValueAt(0, 0)
 					.toString());
 			avg = Double
@@ -57,7 +56,6 @@ public class VariationServer {
 			throw new NullPointerException();
 		}
 		resultSet.close();
-		Rdbms_conn.closeConn();
 
 		return (new double[] { smplSize, maxm, minm, sum, avg, range });
 	}

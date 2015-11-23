@@ -1,7 +1,11 @@
 package com.arrah.dataquality.core;
 
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 public class CreateTable {
 
@@ -9,7 +13,7 @@ public class CreateTable {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(CreateTable.class);
 	
-	String dbstr, tableName, colDesc,isConstraint,constraintDesc;
+	String tableName, colDesc,isConstraint,constraintDesc;
 	String message = "";
 
 	CreateTable() {
@@ -17,12 +21,11 @@ public class CreateTable {
 	}
 
 	public CreateTable(String dbstr, String tableName, String colDesc,String isConstraint,String constraintDesc) {
-		this.dbstr = dbstr;
 		this.tableName = tableName;
 		this.colDesc = colDesc;
 		this.isConstraint=isConstraint;
 		this.constraintDesc=constraintDesc;
-		createTableDDL();
+		createTableDDL(dbstr);
 	}
 
 	public String getMessage() {
@@ -33,13 +36,21 @@ public class CreateTable {
 		this.message = message;
 	}
 
-	public void createTableDDL() {
-		try {
-			ConnectionString.Connection(dbstr);
-			CreateTableServer createTable = new CreateTableServer(dbstr,
+	public void createTableDDL(String dbstr) {
+		Rdbms_NewConn conn = null;
+	  try {
+	    conn = new Rdbms_NewConn(dbstr);
+			CreateTableServer createTable = new CreateTableServer(conn,
 					tableName, colDesc,isConstraint,constraintDesc);
 			message = createTable.getMessage();
 		} catch (Exception e) {
+		  if (conn != null) {
+		    try {
+          conn.closeConn();
+        } catch (SQLException e1) {
+          e1.printStackTrace();
+        }
+		  }
 			LOGGER.error("Error in creating table", e);
 		}
 

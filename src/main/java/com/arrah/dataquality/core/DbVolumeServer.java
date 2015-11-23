@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
@@ -21,30 +21,30 @@ public class DbVolumeServer {
 	 */
 
 	@SuppressWarnings("rawtypes")
-	public static ArrayList[] getVolumeValue() throws SQLException {
+	public static ArrayList[] getVolumeValue(Rdbms_NewConn conn) throws SQLException {
 
 		ArrayList<String> header = null;
 		ArrayList<Row> body = null;
 		ResultSet resultset = null;
 		PreparedStatement pstmt = null;
 
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder stats = new QueryBuilder(dsn, dbType);
+		String dbType = conn.getDBType();
+		String dsn = conn.getHValue("Database_DSN");
+		QueryBuilder stats = new QueryBuilder(conn);
 		String volumeQuery = stats.getVolumeQuery(dsn);
 
 		if (dbType.equalsIgnoreCase("DB2")) {
-			pstmt = Rdbms_conn.createQuery(volumeQuery); // Prepared statement
+			pstmt = conn.createQuery(volumeQuery); // Prepared statement
 															// to execute stored
 															// procedure.
-			resultset = Rdbms_conn.executePreparedQuery(pstmt);
+			resultset = conn.executePreparedQuery(pstmt);
 		} else {
-			resultset = Rdbms_conn.runQuery(volumeQuery);
+			resultset = conn.runQuery(volumeQuery);
 		}
 		if (resultset != null) {
-			ReportTableModel rtm = ResultsetToRTM.getSQLValue(resultset, true);
+		  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			ReportTableModel rtm = resultsetToRTM.getSQLValue(resultset, true);
 			resultset.close();
-			Rdbms_conn.closeConn();
 
 			int rowc = rtm.getModel().getRowCount();
 			int colc = rtm.getModel().getColumnCount();
@@ -95,8 +95,6 @@ public class DbVolumeServer {
 				header.add("DATABASE_SIZE");
 				body.add(row);
 			}
-		} else {
-			throw new NullPointerException();
 		}
 
 		return new ArrayList[] { header, body };
