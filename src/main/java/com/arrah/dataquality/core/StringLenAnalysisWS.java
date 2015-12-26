@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement(name="StringLengthAnalysis")
 public class StringLenAnalysisWS {
@@ -17,7 +17,6 @@ public class StringLenAnalysisWS {
 			.getLogger(StringLenAnalysisWS.class);
 	
 	private String  _table, _col;
-	String dbstr;
 	@XmlElement(name="FreqAnalysis")
 	ArrayList<String> freqHeader;
 	@XmlElement(name="VariationAnalysis")
@@ -39,20 +38,21 @@ public class StringLenAnalysisWS {
 	public StringLenAnalysisWS(String dbStr,String tableName, String columnName) {
 		_col = columnName;
 		_table = tableName;
-		dbstr = dbStr;
-		getDataforAnalysis();
+		getDataforAnalysis(dbStr);
 	}
 	
-	private void getDataforAnalysis() {
-		try{
-			ConnectionString.Connection(dbstr);
-			StringLenAnalysis.getDataforAnalysis(_table,_col);
-			freqHeader=StringLenAnalysis.getFreqHeader();
-			freqData=StringLenAnalysis.getFreqData();
-			varHeader=StringLenAnalysis.getVarHeader();
-			varData=StringLenAnalysis.getVarData();
-			percentHeader=StringLenAnalysis.getPercentHeader();
-			percentData=StringLenAnalysis.getPercentData();
+	private void getDataforAnalysis(String dbStr) {
+		Rdbms_NewConn conn = null;
+	  try{
+	    conn = new Rdbms_NewConn(dbStr);
+	    StringLenAnalysis stringLenAnalysis = new StringLenAnalysis(conn);
+			stringLenAnalysis.getDataforAnalysis(_table,_col);
+			freqHeader=stringLenAnalysis.getFreqHeader();
+			freqData=stringLenAnalysis.getFreqData();
+			varHeader=stringLenAnalysis.getVarHeader();
+			varData=stringLenAnalysis.getVarData();
+			percentHeader=stringLenAnalysis.getPercentHeader();
+			percentData=stringLenAnalysis.getPercentData();
 			
 		}
 		catch(Exception e){
@@ -60,7 +60,9 @@ public class StringLenAnalysisWS {
 		}
 		finally{
 			try{
-				Rdbms_conn.closeConn();
+			  if (conn != null) {
+			    conn.closeConn();
+			  }
 			}
 			catch(Exception e){
 				LOGGER.error("Error in closing connection", e);

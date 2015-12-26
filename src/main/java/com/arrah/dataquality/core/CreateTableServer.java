@@ -1,11 +1,10 @@
 package com.arrah.dataquality.core;
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 
 
 public class CreateTableServer {
 
-	String dbstr;
 	String tableName,createQuery="";
 	String colDesc,isConstraint,constraintDesc;
 
@@ -18,13 +17,12 @@ public class CreateTableServer {
 
 	}
 
-	public CreateTableServer(String dbstr, String tableName, String colDesc,String isConstraint,String constraintDesc) {
-		this.dbstr = dbstr;
+	public CreateTableServer(Rdbms_NewConn conn, String tableName, String colDesc,String isConstraint,String constraintDesc) {
 		this.tableName = tableName;
 		this.colDesc = colDesc;
 		this.isConstraint=isConstraint;
 		this.constraintDesc=constraintDesc;
-		createTable();
+		createTable(conn);
 	}
 
 	public String getMessage() {
@@ -35,13 +33,12 @@ public class CreateTableServer {
 		this.message = message;
 	}
 
-	public void createTable() {
+	public void createTable(Rdbms_NewConn conn) {
 		try {
-			QueryBuilder queryDB = new QueryBuilder(
-					Rdbms_conn.getHValue("Database_DSN"),Rdbms_conn.getDBType());
+			QueryBuilder queryDB = new QueryBuilder(conn);
 			createQuery=queryDB.getCreateTableQuery(colDesc,tableName,isConstraint,constraintDesc);
 			System.out.println(createQuery);
-			Rdbms_conn.executeUpdate(createQuery);
+			conn.executeUpdate(createQuery);
 
 			setMessage("The table " + tableName + " was created successfully");
 

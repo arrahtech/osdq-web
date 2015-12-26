@@ -1,14 +1,17 @@
 package com.arrah.dataquality.core;
 
+import java.sql.SQLException;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
+
 @XmlRootElement
 public class DeleteRow {
-	private String dbstr;
 	private String message;
 	private String table, column, resp;
 	private Object value;
@@ -17,14 +20,13 @@ public class DeleteRow {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(DeleteRow.class);
 
-	public DeleteRow(String _dbstr, String _table, String _column,
+	public DeleteRow(String dbConnectionURI, String _table, String _column,
 			Object _value, String _resp)  {
-		dbstr = _dbstr;
 		table = _table;
 		column = _column;
 		value = _value;
 		resp = _resp;
-		deleteRec(dbstr, table, column, value, resp);
+		deleteRec(dbConnectionURI, table, column, value, resp);
 	}
 
 	public DeleteRow() {
@@ -39,12 +41,13 @@ public class DeleteRow {
 		this.message = message;
 	}
 
-	public void deleteRec(String _dbstr, String _table, String _column,
+	public void deleteRec(String dbConnectionURI, String _table, String _column,
 			Object value, String resp) {
-
+	  Rdbms_NewConn conn = null;
 		try {
+		  conn = new Rdbms_NewConn(dbConnectionURI);
 			if (resp.equalsIgnoreCase("yes") || resp.equalsIgnoreCase("y")) {
-				DeleteRowServer.deleteRecord(_dbstr, _table, _column, value);
+				DeleteRowServer.deleteRecord(conn, _table, _column, value);
 				setMessage("query executed successfully!");
 			} else if (resp.equalsIgnoreCase("no")
 					|| resp.equalsIgnoreCase("n")) {
@@ -55,6 +58,14 @@ public class DeleteRow {
 		} catch (Exception se) {
 			setMessage("ERROR!!" + se.getLocalizedMessage());
 			LOGGER.error("Error in delete row", se);
+		} finally {
+		  if (conn != null) {
+		    try {
+          conn.closeConn();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+		  }
 		}
 
 	}

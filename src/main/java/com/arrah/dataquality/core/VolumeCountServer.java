@@ -10,16 +10,22 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 import com.arrah.framework.dataquality.SqlType;
 
 public class VolumeCountServer {
 	
-	private static final Logger LOGGER = LoggerFactory
+	private final Logger LOGGER = LoggerFactory
 			.getLogger(VolumeCountServer.class);
 
+	private Rdbms_NewConn conn = null;
+	
+	
+	public VolumeCountServer(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
 	/**
 	 * 
 	 * Returns useful information about database volume including average,
@@ -42,7 +48,7 @@ public class VolumeCountServer {
 	 *            </p>
 	 */
 
-	public static double[] getVolumeCountValues(String tableName,
+	public double[] getVolumeCountValues(String tableName,
 			String columnName, String start, String end) throws SQLException {
 
 		ArrayList<String> dates = new ArrayList<String>();
@@ -50,11 +56,9 @@ public class VolumeCountServer {
 
 		double avrg = 0.0D, max = 0.0D, min = 0.0D, aad = 0.0D, skew = 0.0D, kurt = 0.0D, range = 0.0D, smsize = 0.0D, variance = 0.0D, sum = 0.0D, medn = 0.0D, mod = 0.0D, kurtosis = 0.0D, skewness = 0.0D, midRange = 0.0D, midRange199 = 0.0D, midRange595 = 0.0D, midRange1090 = 0.0D, midRange1585 = 0.0D, midRange2080 = 0.0D, midRange2575 = 0.0D, midRange3070 = 0.0D, midRange3565 = 0.0D, midRange4060 = 0.0D;
 
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder stats = new QueryBuilder(dsn, tableName, columnName,
-				dbType);
-		DatabaseMetaData metadata = Rdbms_conn.getMetaData();
+		String dbType = conn.getDBType();
+		QueryBuilder stats = new QueryBuilder(conn, tableName, columnName);
+		DatabaseMetaData metadata = conn.getMetaData();
 		ResultSet resultSet = metadata.getColumns(null, null, tableName, null);
 		try {
 			while (resultSet.next()) {
@@ -95,14 +99,15 @@ public class VolumeCountServer {
 						}
 
 						/* Setting WHERE clause */
-						QueryBuilder.setCond(query);
+						stats.setCond(query);
 						String volumeCount = stats.bottomQuery(true,
 								"col_Name", "100");
 						
 						LOGGER.debug(volumeCount);
-						ResultSet resultset = Rdbms_conn.runQuery(volumeCount);
+						ResultSet resultset = conn.runQuery(volumeCount);
 						if (resultset != null) {
-							ReportTableModel rtm = ResultsetToRTM.getSQLValue(
+						  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+							ReportTableModel rtm = resultsetToRTM.getSQLValue(
 									resultset, true);
 							int rowc = rtm.getModel().getRowCount();
 							SimpleDateFormat formatter = new SimpleDateFormat(
@@ -153,9 +158,9 @@ public class VolumeCountServer {
 									count += date[0] + "#";
 
 								}
-								ResultSet resultset1 = Rdbms_conn
+								ResultSet resultset1 = conn
 										.runQuery(count);
-								ReportTableModel rtm1 = ResultsetToRTM
+								ReportTableModel rtm1 = resultsetToRTM
 										.getSQLValue(resultset1, true);
 
 								value.add(rtm1.getModel().getValueAt(0, 0)
@@ -165,7 +170,6 @@ public class VolumeCountServer {
 						} else {
 							throw new NullPointerException();
 						}
-						Rdbms_conn.closeConn();
 						smsize = value.size();
 						if (smsize != 0) {
 							max = Double.parseDouble(value.get(0));

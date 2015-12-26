@@ -7,30 +7,36 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
 public class ExecuteQueryServer {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ExecuteQuery.class);
-	static ArrayList<String> header;
-	static ArrayList<Row> body;
+	private ArrayList<String> header;
+	private ArrayList<Row> body;
 
-	public static ArrayList<String> getHeader() {
+	private Rdbms_NewConn conn = null;
+	
+	ExecuteQueryServer(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
+	
+	public ArrayList<String> getHeader() {
 		return header;
 	}
 
-	public static void setHeader(ArrayList<String> header) {
-		ExecuteQueryServer.header = header;
+	public void setHeader(ArrayList<String> header) {
+		this.header = header;
 	}
 
-	public static ArrayList<Row> getBody() {
+	public ArrayList<Row> getBody() {
 		return body;
 	}
 
-	public static void setBody(ArrayList<Row> body) {
-		ExecuteQueryServer.body = body;
+	public void setBody(ArrayList<Row> body) {
+		this.body = body;
 	}
 
 	/**
@@ -42,7 +48,7 @@ public class ExecuteQueryServer {
 	 *            query to be executed
 	 * @throws SQLException
 	 */
-	public static void executeQuery(String query) {
+	public void executeQuery(String query) {
 		String s1 = query;
 		ResultSet resultset = null;
 		ReportTableModel _rtm;
@@ -51,7 +57,7 @@ public class ExecuteQueryServer {
 			if (s1 != null
 					&& (!query.contains("delete") || !query.contains("update") || !query
 							.contains("insert"))) {
-				resultset = Rdbms_conn.runQuery(s1, 100);
+				resultset = conn.runQuery(s1, 100);
 			}
 		} catch (Exception e) {
 			e.getLocalizedMessage();
@@ -61,7 +67,8 @@ public class ExecuteQueryServer {
 				&& (!query.contains("delete") || !query.contains("update") || !query
 						.contains("insert"))) {
 			try {
-				_rtm = ResultsetToRTM.getSQLValue(resultset, true);
+			  ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+				_rtm = resultsetToRTM.getSQLValue(resultset, true);
 				if (_rtm == null) {
 
 					LOGGER.debug("Please enter a valid query");
@@ -93,13 +100,11 @@ public class ExecuteQueryServer {
 					body.add(i, row);
 				}
 				setBody(body);
-
 			} catch (SQLException se) {
 				se.getLocalizedMessage();
 			} finally {
 				try {
 					resultset.close();
-					Rdbms_conn.closeConn();
 				} catch (Exception e) {
 					e.getLocalizedMessage();
 				}

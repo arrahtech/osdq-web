@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.arrah.framework.dataquality.FirstInformation;
 import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 public class ColumnProfile {
@@ -67,14 +67,12 @@ public class ColumnProfile {
 		column = columnName;
 	}
 
-	public double[] getProfile(String dbStr) {
+	public double[] getProfile(String dbConnectionURI) {
+	  Rdbms_NewConn conn = null;
 		try {
-			ConnectionString.Connection(dbStr);
-			String dbType = Rdbms_conn.getDBType();
-			String dsn = Rdbms_conn.getHValue("Database_DSN");
-			QueryBuilder colProfile_qb = new QueryBuilder(dsn, table, column,
-					dbType);
-			double ad[] = FirstInformation.getProfileValues(colProfile_qb);
+		  conn = new Rdbms_NewConn(dbConnectionURI);
+			QueryBuilder colProfile_qb = new QueryBuilder(conn, table, column);
+			double ad[] = FirstInformation.getProfileValues(conn, colProfile_qb);
 			Total = ad[0];
 			Unique = ad[1];
 			Repeat = ad[2];
@@ -88,7 +86,9 @@ public class ColumnProfile {
 			return Profile_a;
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+			  if (conn != null) {
+			    conn.closeConn();
+			  }
 			} catch (Exception e) {
 				LOGGER.error("Error in closing connection", e);
 			}

@@ -4,78 +4,79 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.StatisticalAnalysis;
 
 public class StringLenAnalysis {
-	private static String _dsn;
-	private static ArrayList<Integer> _colObj;
-	static ArrayList<Row> freqData, varData, percentData;
-	static ArrayList<String> freqHeader, varHeader, percentHeader;
-	static String dbstr;
-	public StringLenAnalysis(){
-		
+	private ArrayList<Integer> _colObj;
+	private ArrayList<Row> freqData, varData, percentData;
+	private ArrayList<String> freqHeader, varHeader, percentHeader;
+	
+	private Rdbms_NewConn conn = null;
+	
+	public StringLenAnalysis(Rdbms_NewConn conn){
+		this.conn = conn;
 	}
 		
-	public static ArrayList<Row> getFreqData() {
+	public ArrayList<Row> getFreqData() {
 		return freqData;
 	}
 
-	public static void setFreqData(ArrayList<Row> freqData) {
-		StringLenAnalysis.freqData = freqData;
+	public void setFreqData(ArrayList<Row> freqData) {
+		this.freqData = freqData;
 	}
 
-	public static ArrayList<Row> getVarData() {
+	public ArrayList<Row> getVarData() {
 		return varData;
 	}
 
-	public static void setVarData(ArrayList<Row> varData) {
-		StringLenAnalysis.varData = varData;
+	public void setVarData(ArrayList<Row> varData) {
+		this.varData = varData;
 	}
 
-	public static ArrayList<Row> getPercentData() {
+	public ArrayList<Row> getPercentData() {
 		return percentData;
 	}
 
-	public static void setPercentData(ArrayList<Row> percentData) {
-		StringLenAnalysis.percentData = percentData;
+	public void setPercentData(ArrayList<Row> percentData) {
+		this.percentData = percentData;
 	}
 
-	public static ArrayList<String> getFreqHeader() {
+	public ArrayList<String> getFreqHeader() {
 		return freqHeader;
 	}
 
-	public static void setFreqHeader(ArrayList<String> freqHeader) {
-		StringLenAnalysis.freqHeader = freqHeader;
+	public void setFreqHeader(ArrayList<String> freqHeader) {
+		this.freqHeader = freqHeader;
 	}
 
-	public static ArrayList<String> getVarHeader() {
+	public ArrayList<String> getVarHeader() {
 		return varHeader;
 	}
 
-	public static void setVarHeader(ArrayList<String> varHeader) {
-		StringLenAnalysis.varHeader = varHeader;
+	public void setVarHeader(ArrayList<String> varHeader) {
+		this.varHeader = varHeader;
 	}
 
-	public static ArrayList<String> getPercentHeader() {
+	public ArrayList<String> getPercentHeader() {
 		return percentHeader;
 	}
 
-	public static void setPercentHeader(ArrayList<String> percentHeader) {
-		StringLenAnalysis.percentHeader = percentHeader;
+	public void setPercentHeader(ArrayList<String> percentHeader) {
+		this.percentHeader = percentHeader;
 	}
 
-	public static void getDataforAnalysis(String table,String col) {
+	public void getDataforAnalysis(String table,String col) {
 		
 		StatisticalAnalysis sa=null;
 		ResultSet rs=null;
 		try {
-			_dsn=Rdbms_conn.getHValue("Database_DSN");
+			String _dsn= conn.getHValue("Database_DSN");
 			
-			QueryBuilder s_prof = new QueryBuilder(_dsn, table, col,
-					Rdbms_conn.getDBType());
+			QueryBuilder s_prof = new QueryBuilder(conn, table, col
+					);
 			String query = s_prof.get_all_worder_query();
-			rs = Rdbms_conn.runQuery(query);
+			rs = conn.runQuery(query);
 			_colObj = new ArrayList<Integer>();
 
 			while (rs.next()) {
@@ -183,7 +184,6 @@ public class StringLenAnalysis {
 
 			try {
 				rs.close();
-				Rdbms_conn.closeConn();
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}

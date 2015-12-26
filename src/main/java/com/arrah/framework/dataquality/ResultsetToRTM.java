@@ -35,10 +35,14 @@ import java.util.Vector;
 
 public class ResultsetToRTM {
 
-	public ResultsetToRTM() {
+  
+  private Rdbms_NewConn conn = null;
+  
+	public ResultsetToRTM(Rdbms_NewConn conn) {
+	  this.conn = conn;
 	}
 
-	public static ReportTableModel getSQLValue(ResultSet rs, boolean format)
+	public ReportTableModel getSQLValue(ResultSet rs, boolean format)
 			throws SQLException {
 
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -348,29 +352,23 @@ public class ResultsetToRTM {
 		return rt;
 	}
 
-	synchronized public static ReportTableModel compareTable(String lTable, Hashtable<String,String> newDBParam, String rtable,
+	synchronized public ReportTableModel compareTable(String lTable, Rdbms_NewConn newConn, String rtable,
 					boolean match) throws SQLException  {
 		
 		ReportTableModel rtm = null;
-		Vector avector[] = Rdbms_conn.populateColumn(lTable,null);
+		Vector avector[] = conn.populateColumn(lTable,null);
 		QueryBuilder qb = new QueryBuilder(
-				Rdbms_conn.getHValue("Database_DSN"), lTable,
-				Rdbms_conn.getDBType());
+				conn, lTable);
 		String s1 = qb.get_selCol_query(avector[0].toArray(),"");
 		
 	
-		Rdbms_conn.openConn();
-		ResultSet resultset = Rdbms_conn.runQuery(s1); 
+		ResultSet resultset = conn.runQuery(s1); 
 		Vector<BigInteger> hashNumber = ResultsetToRTM.getMD5Value(resultset);
 		resultset.close();
-		Rdbms_conn.closeConn();
 		
 		// Query to another table
 
-		Rdbms_NewConn newConn = new Rdbms_NewConn(newDBParam);
-		    qb  = new QueryBuilder(
-				newConn.getHValue("Database_DSN"), rtable,
-				newConn.getDBType());
+
 		Vector avectorR[] = newConn.populateColumn(rtable,null);
 		s1 = qb.get_selCol_query(avectorR[0].toArray(),"");
 		

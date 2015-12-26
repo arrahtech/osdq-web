@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 @XmlType(propOrder = { "firstDate", "latestDate", "modDate", "medianDate",
@@ -22,7 +22,6 @@ public class Timeliness {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(Timeliness.class);
-	private String dbstr;
 	private String table;
 	private String column;
 	private String start;
@@ -152,21 +151,20 @@ public class Timeliness {
 	public Timeliness() {
 	}
 
-	public Timeliness(String dbStr, String tableName, String columnName,
+	public Timeliness(String dbConnectionURI, String tableName, String columnName,
 			String strt, String rng){
 		table = tableName;
 		column = columnName;
 		start = strt;
 		end = rng;
-		dbstr = dbStr;
-		getTimeliness(dbstr);
+		getTimeliness(dbConnectionURI);
 	}
 
 	public void getTimeliness(String dbStr) {
-
+	  Rdbms_NewConn conn = null;
 		try {
-			ConnectionString.Connection(dbStr);
-			String values[] = TimelinessServer.getTimelinessValues(table,
+		  conn = new Rdbms_NewConn(dbStr);
+			String values[] = TimelinessServer.getTimelinessValues(conn, table,
 					column, start, end);
 
 			avg = values[0];
@@ -193,7 +191,7 @@ public class Timeliness {
 			LOGGER.error(e.getLocalizedMessage());
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+				conn.closeConn();
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}

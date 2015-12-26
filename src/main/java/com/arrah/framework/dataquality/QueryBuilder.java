@@ -33,59 +33,61 @@ public class QueryBuilder {
 	protected String _dsn, _table, _column, _dtype;
 	protected String _table1, _column1; // for table comparison
 
-	private static boolean isCond = false;
-	private static String _cond_q = "";
-	private static Vector<?>[] dateVar;
+	private boolean isCond = false;
+	private String _cond_q = "";
+	private Vector<?>[] dateVar;
 	
-	public QueryBuilder() {
-		
-	}
+	private Rdbms_NewConn conn = null;
+	
 
-	public QueryBuilder(String Dsn, String Table, String Column, String DBType) {
-		set_dsn(Dsn);
+	public QueryBuilder(Rdbms_NewConn conn, String Table, String Column) {
+		this.conn = conn;
+	  set_dsn(conn.getDSN());
 		_table = Table;
 		_column = Column;
-		_dtype = DBType;
+		_dtype = conn.getDBType();
 		if (_dtype.compareToIgnoreCase("mysql") != 0 
 				&& _dtype.compareToIgnoreCase("hive") != 0 
 				&& _dtype.compareToIgnoreCase("informix") != 0 
 				&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-						Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) )
+						conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) )
 		{
 			if (!_table.startsWith("\""))
 				_table = "\"" + _table + "\"";
 			if (!_column.startsWith("\""))
 				_column = "\"" + _column + "\"";
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat)))
 			_table = cat + "." + _table;
 	}
 
 	/* Use for Table query */
-	public QueryBuilder(String Dsn, String Table, String DBType) {
-		set_dsn(Dsn);
+	public QueryBuilder(Rdbms_NewConn conn, String Table) {
+		this.conn = conn;
+	  set_dsn(conn.getDSN());
 		_table = Table;
 		_column = "";
-		_dtype = DBType;
+		_dtype = conn.getDBType();
 		if (_dtype.compareToIgnoreCase("mysql") != 0 
 			    && _dtype.compareToIgnoreCase("hive") != 0 
 			    && _dtype.compareToIgnoreCase("Informix") != 0 
 			    && !(_dtype.compareToIgnoreCase("Others") == 0 && 
-						Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) )
+						conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) )
 		{
 			if (!_table.startsWith("\""))
 				_table = "\"" + _table + "\"";
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat)))
 			_table = cat + "." + _table;
 	}
 
 	/* Use for ETL query */
-	public QueryBuilder(String Dsn, String DBType) {
-		set_dsn(Dsn);
-		_dtype = DBType;
+	public QueryBuilder(Rdbms_NewConn conn) {
+		set_dsn(conn.getDSN());
+		_dtype = conn.getDBType();
+		this.conn = conn;
 	}
 
 	/* Setting Comparison Table - set column dynamically */
@@ -96,14 +98,14 @@ public class QueryBuilder {
 				&& _dtype.compareToIgnoreCase("hive") != 0
 				&& _dtype.compareToIgnoreCase("informix") != 0
 				&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-						Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) ) 
+						conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ) ) 
 		{
 			if (!_table1.startsWith("\""))
 				_table1 = "\"" + _table1 + "\"";
 			if (!_column1.startsWith("\""))
 				_column1 = "\"" + _column1 + "\"";
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat)))
 			_table1 = cat + "." + _table1;
 	}
@@ -943,7 +945,8 @@ public class QueryBuilder {
 	/* Get like for SearchDB Query */
 	public String get_like_table(String searchS, int index, boolean isCount) {
 		Vector<?> avector[] = null;
-		avector = TableMetaInfo.populateTable(5, index, index + 1, avector);
+		TableMetaInfo tableMetaInfo = new TableMetaInfo(conn);
+		avector = tableMetaInfo.populateTable(5, index, index + 1, avector);
 		String columns = "";
 		if (avector == null ) return null;
 		for (int j = 0; j < avector[0].size() - 1; j++) {
@@ -960,7 +963,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector[0].elementAt(j) + "\" LIKE \'%"
 						+ searchS + "%\' OR ";
 			else
@@ -982,7 +985,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector[0].elementAt(avector[0].size() - 1)
 						+ "\" LIKE \'%" + searchS + "%\'";
 			else
@@ -1020,7 +1023,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector.elementAt(j) + "\" LIKE \'%"
 						+ searchS + "%\' OR ";
 			else
@@ -1042,7 +1045,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector.elementAt(avector.size() - 1)
 						+ "\" LIKE \'%" + searchS + "%\'";
 			else
@@ -1063,7 +1066,7 @@ public class QueryBuilder {
 	public String get_tb_value(boolean isOrd) {
 		String table = _table.charAt(0) == '"' ? _table.replaceAll("\"", "")
 				: _table;
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 					
 		if (!(cat == null || "".equals(cat)) && cat.charAt(0)=='"') {
 				table = table.substring(cat.length()-1); //strip cat
@@ -1072,11 +1075,12 @@ public class QueryBuilder {
 				table = table.charAt(0) == '"' ? table.replaceAll("\"", "") : table;
 		}
 		
-		Vector<String> vector = Rdbms_conn.getTable(); // this will be without catalog append.
+		Vector<String> vector = conn.getTable(); // this will be without catalog append.
 		int i = vector.indexOf(table);
 
 		Vector<?> avector[] = null;
-		avector = TableMetaInfo.populateTable(5, i, i + 1, avector);
+		TableMetaInfo tableMetaInfo = new TableMetaInfo(conn);
+		avector = tableMetaInfo.populateTable(5, i, i + 1, avector);
 		String columns = "";
 		if (avector == null )return null;
 		
@@ -1085,7 +1089,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector[0].elementAt(j) + "\"" + ",";
 			else
 				columns += avector[0].elementAt(j) + ",";
@@ -1095,7 +1099,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
 				columns += "\"" + avector[0].elementAt(avector[0].size() - 1)
 						+ "\"";
 			else
@@ -1114,7 +1118,7 @@ public class QueryBuilder {
 	public String[] get_mapping_query(Hashtable<String, Vector<String>> tb,
 			Vector<String> tableV) {
 		String[] map_query = new String[tb.size()];
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		int index = 0;
 
 		for (Enumeration<String> e = tb.keys(); e.hasMoreElements(); index++) {
@@ -1130,7 +1134,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!table.startsWith("\""))
 					table = "\"" + table + "\"";
 			}
@@ -1143,7 +1147,7 @@ public class QueryBuilder {
 						&& _dtype.compareToIgnoreCase("hive") != 0
 						&& _dtype.compareToIgnoreCase("informix") != 0
 						&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-								Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+								conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 					if (!col.startsWith("\""))
 						col = "\"" + col + "\"";
 				}
@@ -1161,7 +1165,7 @@ public class QueryBuilder {
 	public Vector<String> get_synch_mapping_query(Vector<String> table_s,
 			Vector<String> column_s) {
 		Vector<String> synch_map_query = new Vector<String>();
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 
 		for (int index = 0; index < table_s.size(); index++) {
 			String table = table_s.get(index);
@@ -1171,7 +1175,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!table.startsWith("\""))
 					table = "\"" + table + "\"";
 			}
@@ -1182,7 +1186,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!col.startsWith("\""))
 					col = "\"" + col + "\"";
 			}
@@ -1204,7 +1208,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!column.startsWith("\""))
 					column = "\"" + column + "\"";
 			}
@@ -1234,7 +1238,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!column.startsWith("\""))
 					column = "\"" + column + "\"";
 			}
@@ -1270,7 +1274,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!column.startsWith("\""))
 					column = "\"" + column + "\"";
 			}
@@ -1294,7 +1298,7 @@ public class QueryBuilder {
 					&& _dtype.compareToIgnoreCase("hive") != 0
 					&& _dtype.compareToIgnoreCase("informix") != 0
 					&& !(_dtype.compareToIgnoreCase("Others") == 0 && 
-							Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
+							conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 )) {
 				if (!colN.startsWith("\""))
 					colN = "\"" + colN + "\"";
 			}
@@ -1314,7 +1318,7 @@ public class QueryBuilder {
                   boolean isLeft) {
            
            String table =" ";
-           String cat = Rdbms_conn.getHValue("Database_Catalog");
+           String cat = conn.getHValue("Database_Catalog");
            
            if (_table.equals(_table1) == false && isLeft == false){
            table = _table1.charAt(0) == '"' ? _table1.replaceAll("\"", "")
@@ -1333,11 +1337,12 @@ public class QueryBuilder {
                         table = table.charAt(0) == '"' ? table.replaceAll("\"", "") : table;
            }
            
-           Vector<String> vector = Rdbms_conn.getTable(); // this will be without catalog append.
+           Vector<String> vector = conn.getTable(); // this will be without catalog append.
            int i = vector.indexOf(table);
 
            Vector<?> avector[] = null;
-           avector = TableMetaInfo.populateTable(5, i, i + 1, avector);
+           TableMetaInfo tableMetaInfo = new TableMetaInfo(conn);
+           avector = tableMetaInfo.populateTable(5, i, i + 1, avector);
            String columns = "";
            if (avector == null )return null;
            
@@ -1346,7 +1351,7 @@ public class QueryBuilder {
                 		  && _dtype.compareToIgnoreCase("hive") != 0
                 		  && _dtype.compareToIgnoreCase("informix") != 0
                 		  && !(_dtype.compareToIgnoreCase("Others") == 0 && 
-          						Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+          						conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
                         columns += "\"" + avector[0].elementAt(j) + "\"" + ",";
                   else
                         columns += avector[0].elementAt(j) + ",";
@@ -1356,7 +1361,7 @@ public class QueryBuilder {
                 		  && _dtype.compareToIgnoreCase("hive") != 0
                 		  && _dtype.compareToIgnoreCase("informix") != 0
                 		  && !(_dtype.compareToIgnoreCase("Others") == 0 && 
-          						Rdbms_conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
+          						conn.getHValue("Database_SupportQuote").compareToIgnoreCase("NO") ==0 ))
                         columns += "\"" + avector[0].elementAt(avector[0].size() - 1)
                                       + "\"";
                   else
@@ -1407,9 +1412,9 @@ public class QueryBuilder {
     }
     
     /* This function is to support count for rowset in hive as hive does not support last(), next() etc
-     * Making it static to use as utility */
+     * Making it to use as utility */
     
-    public static String hive_count_query(String orgquery) {
+    public String hive_count_query(String orgquery) {
     	String query = "SELECT COUNT(*) as total_count FROM ("+orgquery+") t1";
     	return query;
     	
@@ -1890,17 +1895,17 @@ public class QueryBuilder {
 
     // End of new code
     
-	public static void setCond(String query) {
+	public void setCond(String query) {
 		isCond = true;
 		_cond_q = "(" + query + ")";
 	}
 
-	public static void unsetCond() {
+	public void unsetCond() {
 		isCond = false;
 		_cond_q = "";
 	}
 
-	public static String getCond() {
+	public String getCond() {
 		if (isCond)
 			return _cond_q;
 		else
@@ -1908,13 +1913,13 @@ public class QueryBuilder {
 
 	}
 
-	public static Vector<?>[] getDateCondition() {
+	public Vector<?>[] getDateCondition() {
 		if (dateVar == null)
 			return dateVar = new Vector[2];
 		return dateVar;
 	}
 
-	public static void setDateCondition(Vector<?>[] vc) {
+	public void setDateCondition(Vector<?>[] vc) {
 		dateVar = vc;
 	}
 

@@ -9,12 +9,12 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 @XmlType(propOrder = { "header", "body" })
 public class ExecuteQuery {
-	private String query, dbstr = "", message = "";
+	private String query, message = "";
 	private ArrayList<String> header;
 	private ArrayList<Row> body;
 
@@ -25,10 +25,9 @@ public class ExecuteQuery {
 
 	}
 
-	public ExecuteQuery(String _dbstr, String _query) {
+	public ExecuteQuery(String dbConnectionURI, String _query) {
 		query = _query;
-		dbstr = _dbstr;
-		execQuery(dbstr, query);
+		execQuery(dbConnectionURI, query);
 	}
 
 	@XmlElement
@@ -50,19 +49,21 @@ public class ExecuteQuery {
 		return body;
 	}
 
-	private void execQuery(String _dbstr, String query) {
-		try {
-			ConnectionString.Connection(dbstr);
-			ExecuteQueryServer.executeQuery(query);
-			header = ExecuteQueryServer.getHeader();
-			body = ExecuteQueryServer.getBody();
+	private void execQuery(String dbConnectionURI, String query) {
+		Rdbms_NewConn conn = null;
+	  try {
+	    conn = new Rdbms_NewConn(dbConnectionURI);
+	    ExecuteQueryServer executeQueryServer = new ExecuteQueryServer(conn);
+	    executeQueryServer.executeQuery(query);
+			header = executeQueryServer.getHeader();
+			body = executeQueryServer.getBody();
 			setMessage("Query Executed Successfully");
 		} catch (Exception se) {
 			setMessage("ERROR !!! " + se.getLocalizedMessage());
 			LOGGER.error("Error executing query", se);
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+				conn.closeConn();
 			} catch (Exception e) {
 				LOGGER.error("Error in closing connection ", e);
 			}

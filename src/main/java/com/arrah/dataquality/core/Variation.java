@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 public class Variation {
@@ -16,7 +16,6 @@ public class Variation {
 			.getLogger(Variation.class);
 	private String table;
 	private String column;
-	private String dbstr;
 
 	private double SmplSize = 0.0D;
 	private double Maxm = 0.0D;
@@ -65,21 +64,21 @@ public class Variation {
 		return Avg;
 	}
 
-	public Variation(String tableName, String columnName, String dbStr)
+	public Variation(String tableName, String columnName, String dbConnectionURI)
 	{
 		table = tableName;
 		column = columnName;
-		dbstr = dbStr;
-		getVariation(dbstr);
+		getVariation(dbConnectionURI);
 	}
 
 	public Variation() {
 	}
 
 	public void getVariation(String dbStr) {
-		try {
-			ConnectionString.Connection(dbStr);
-			double values[] = VariationServer.getVariationValues(table, column);
+		Rdbms_NewConn conn = null;
+	  try {
+	    conn = new Rdbms_NewConn(dbStr);
+			double values[] = VariationServer.getVariationValues(conn, table, column);
 
 			SmplSize = values[0];
 			Maxm = values[1];
@@ -92,7 +91,7 @@ public class Variation {
 		}
 		finally{
 			try{
-			Rdbms_conn.closeConn();
+			conn.closeConn();
 			}
 			catch(Exception e){
 				e.getLocalizedMessage();

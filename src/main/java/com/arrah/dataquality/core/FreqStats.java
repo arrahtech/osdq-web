@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 @XmlType(propOrder = { "table", "column", "values", "freq", "percntFreq" })
@@ -21,7 +21,6 @@ public class FreqStats {
 			.getLogger(FreqStats.class);
 	private String table;
 	private String column;
-	private String dbstr;
 
 	private ArrayList<String> Values;
 	private ArrayList<String> freq;
@@ -56,21 +55,20 @@ public class FreqStats {
 		return percntFreq;
 	}
 
-	public FreqStats(String tableName, String columnName, String dbStr)
+	public FreqStats(String tableName, String columnName, String dbConnectionURI)
 			throws SQLException {
 		table = tableName;
 		column = columnName;
-		dbstr = dbStr;
-		getStatistics(dbstr, table, column);
+		getStatistics(dbConnectionURI, table, column);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void getStatistics(String dbStr, String tableName, String columnName) {
-
+	private void getStatistics(String dbConnectionURI, String tableName, String columnName) {
+	  Rdbms_NewConn conn = null;
 		try {
-			ConnectionString.Connection(dbStr);
-			ArrayList[] values = FreqStatsServer
-					.getStats(tableName, columnName);
+		  conn = new Rdbms_NewConn(dbConnectionURI);
+		  FreqStatsServer freqStatsServer = new FreqStatsServer(conn);
+			ArrayList[] values = freqStatsServer.getStats(tableName, columnName);
 			Values = values[0];
 			freq = values[1];
 			percntFreq = values[2];
@@ -78,7 +76,9 @@ public class FreqStats {
 			LOGGER.error(e.getLocalizedMessage());
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+			  if (conn != null) {
+			    conn.closeConn();
+			  }
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}

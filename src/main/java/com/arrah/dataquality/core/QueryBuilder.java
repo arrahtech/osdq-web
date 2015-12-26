@@ -8,7 +8,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.TableMetaInfo;
 
 
@@ -18,9 +18,9 @@ public class QueryBuilder {
 	private String dsnName, tableName, columnName, dType;
 	private String tableName1, columnName1; // for table comparison
 
-	private static boolean isCond = false;
-	private static String condQuery = "";
-	private static Vector<?>[] dateVar;
+	private  boolean isCond = false;
+	private String condQuery = "";
+	private Vector<?>[] dateVar;
 	String mysql = "mysql";
 	String postgres = "postgres";
 	String oracleNative = "oracle_native";
@@ -28,12 +28,14 @@ public class QueryBuilder {
 	String sqlServer = "sql_Server";
 	String db2 = "DB2";
 	String oracleOdbc = "oracle_odbc";
+	
+	private Rdbms_NewConn conn = null;
 
-	public QueryBuilder(String dsn, String table, String column, String dbType) {
-		set_dsn(dsn);
+	public QueryBuilder(Rdbms_NewConn conn, String table, String column) {
+		set_dsn(conn.getDSN());
 		tableName = table;
 		columnName = column;
-		dType = dbType;
+		dType = conn.getDBType();
 
 		if (!dType.equalsIgnoreCase(mysql)
 				&& !dType.equalsIgnoreCase(msAccess)
@@ -44,32 +46,34 @@ public class QueryBuilder {
 			if (!columnName.startsWith("\""))
 				columnName = "\"" + columnName + "\"";			
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat)))
 			tableName = cat + "." + tableName;
 	}
 
 	/* Use for Table query */
-	public QueryBuilder(String dsn, String table, String dbType) {
-		set_dsn(dsn);
+	public QueryBuilder(Rdbms_NewConn conn, String table) {
+		this.conn = conn;
+	  set_dsn(conn.getDSN());
 		tableName = table;
 		columnName = "";
-		dType = dbType;
+		dType = conn.getDBType();
 		if (!dType.equalsIgnoreCase(mysql)
 				&& !dType.equalsIgnoreCase(msAccess)
 				&& !dType.equalsIgnoreCase(oracleNative)) {
 			if (!tableName.startsWith("\""))
 				tableName = "\"" + tableName + "\"";
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat)))
 			tableName = cat + "." + tableName;
 	}
 
 	/* Use for ETL query */
-	public QueryBuilder(String dsn, String dbType) {
-		set_dsn(dsn);
-		dType = dbType;
+	public QueryBuilder(Rdbms_NewConn conn) {
+		this.conn = conn;
+	  set_dsn(conn.getDSN());
+		dType = conn.getDBType();
 	}
 
 	/* Setting Comparison Table */
@@ -84,7 +88,7 @@ public class QueryBuilder {
 				columnName1 = "\"" + columnName1 + "\"";
 			}
 		}
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		if (!(cat == null || "".equals(cat))){
 			tableName1 = cat + "." + tableName1;
 		}
@@ -737,7 +741,8 @@ public class QueryBuilder {
 	/* Get like for SearchDB Query */
 	public String getLikeTable(String searchS, int index, boolean isCount) {
 		Vector<?> avector[] = null;
-		avector = TableMetaInfo.populateTable(5, index, index + 1, avector);
+		TableMetaInfo tableMetaInfo = new TableMetaInfo(conn);
+		avector = tableMetaInfo.populateTable(5, index, index + 1, avector);
 		String columns = "";
 		if (avector == null)
 			return null;
@@ -824,11 +829,12 @@ public class QueryBuilder {
 	public String getTbValue(boolean isOrd) {
 		String table = tableName.charAt(0) == '"' ? tableName.replaceAll("\"", "")
 				: tableName;
-		Vector<String> vector = Rdbms_conn.getTable();
+		Vector<String> vector = conn.getTable();
 		int i = vector.indexOf(table);
 
 		Vector<?> avector[] = null;
-		avector = TableMetaInfo.populateTable(5, i, i + 1, avector);
+		TableMetaInfo tableMetaInfo = new TableMetaInfo(conn);
+		avector = tableMetaInfo.populateTable(5, i, i + 1, avector);
 		String columns = "";
 		if (avector == null)
 			return null;
@@ -859,7 +865,7 @@ public class QueryBuilder {
 	public String[] getMappingQuery(Hashtable<String, Vector<String>> tb,
 			Vector<String> tableV) {
 		String[] mapQuery = new String[tb.size()];
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 		int index = 0;
 
 		for (Enumeration<String> e = tb.keys(); e.hasMoreElements(); index++) {
@@ -899,7 +905,7 @@ public class QueryBuilder {
 	public Vector<String> getSynchMappingQuery(Vector<String> tableS,
 			Vector<String> columnS) {
 		Vector<String> synchMapQuery = new Vector<String>();
-		String cat = Rdbms_conn.getHValue("Database_Catalog");
+		String cat = conn.getHValue("Database_Catalog");
 
 		for (int index = 0; index < tableS.size(); index++) {
 			String table = tableS.get(index);
@@ -1181,17 +1187,17 @@ public class QueryBuilder {
 		}
 		return updateQuery;
 	}
-	public static void setCond(String query) {
+	public void setCond(String query) {
 		isCond = true;
 		condQuery = "(" + query + ")";
 	}
 
-	public static void unsetCond() {
+	public void unsetCond() {
 		isCond = false;
 		condQuery = "";
 	}
 
-	public static String getCond() {
+	public String getCond() {
 		if (isCond)
 			return condQuery;
 		else
@@ -1199,13 +1205,13 @@ public class QueryBuilder {
 
 	}
 
-	public static Vector<?>[] getDateCondition() {
+	public Vector<?>[] getDateCondition() {
 		if (dateVar == null)
 			return dateVar = new Vector[2];
 		return dateVar;
 	}
 
-	public static void setDateCondition(Vector<?>[] vc) {
+	public void setDateCondition(Vector<?>[] vc) {
 		dateVar = vc;
 	}
 

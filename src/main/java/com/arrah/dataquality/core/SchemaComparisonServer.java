@@ -5,31 +5,37 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 
 
 public class SchemaComparisonServer {
 
 
-	static ArrayList<String> header;
+	ArrayList<String> header;
 
-	static ArrayList<Row> body;
+	ArrayList<Row> body;
 
-	static ArrayList<String> procedureHeader;
+	ArrayList<String> procedureHeader;
 
-	static ArrayList<Row> procedureBody;
+	ArrayList<Row> procedureBody;
 	
 
-	static ArrayList<String> schemaSecHeader;
+	ArrayList<String> schemaSecHeader;
 
-	static ArrayList<String> schemaHeader;
+	ArrayList<String> schemaHeader;
 
-	static ArrayList<String> schemaBody;
+	ArrayList<String> schemaBody;
 
-	static ArrayList<String> schemaSecBody;
+	ArrayList<String> schemaSecBody;
 	
 	String message="";
 	
+	private Rdbms_NewConn conn = null;
+	
+	public SchemaComparisonServer(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
 
 	public String getMessage() {
 		return message;
@@ -40,7 +46,7 @@ public class SchemaComparisonServer {
 	}
 
 
-	static ArrayList<String> tbName;
+	ArrayList<String> tbName;
 
 	@SuppressWarnings("rawtypes")
 	ArrayList[] schemaValuesPrimary;
@@ -64,7 +70,7 @@ public class SchemaComparisonServer {
 	String dbstr = "";
 	String dbstrSecondary="";
 	
-	static ReportTableModel rtm = null, rtm1 = null,rtm2=null;
+	ReportTableModel rtm = null, rtm1 = null,rtm2=null;
 
 	public SchemaComparisonServer() {
 
@@ -80,13 +86,12 @@ public class SchemaComparisonServer {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList[] getSchemaDataPrimary(String dbstr) throws SQLException {
-		ConnectionString.Connection(dbstr);
-		ArrayList[] parameterValues = SchemaComparisonServer.parameterInfo();
+		ArrayList[] parameterValues = parameterInfo();
 		header = parameterValues[0];
 		body = parameterValues[1];
 		
 		
-		schemaValuesPrimary = SchemaComparisonServer.schemaInfo(schemaHeader,schemaBody);
+		schemaValuesPrimary = schemaInfo(schemaHeader,schemaBody);
 		setSchemaValuesPrimary(schemaValuesPrimary);
 		schemaHeader = schemaValuesPrimary[0];
 		schemaBody = schemaValuesPrimary[1];
@@ -97,8 +102,7 @@ public class SchemaComparisonServer {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList[] getSchemaDataSecondary(String dbstrS) throws SQLException {
-		ConnectionString.Connection(dbstrSecondary);
-		schemaValuesSecondary = SchemaComparisonServer.schemaInfo(schemaSecHeader,schemaSecBody);
+		schemaValuesSecondary = schemaInfo(schemaSecHeader,schemaSecBody);
 		setSchemaValuesSecondary(schemaValuesSecondary);
 		schemaSecHeader = schemaValuesSecondary[0];
 		schemaSecBody = schemaValuesSecondary[1];
@@ -140,8 +144,8 @@ public class SchemaComparisonServer {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static ArrayList[] parameterInfo() throws SQLException {
-		DBMetaInfo dbmeta = new DBMetaInfo();
+	public ArrayList[] parameterInfo() throws SQLException {
+		DBMetaInfo dbmeta = new DBMetaInfo(conn);
 		rtm = dbmeta.getParameterInfo();
 
 		if (rtm != null) {
@@ -177,9 +181,9 @@ public class SchemaComparisonServer {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static ArrayList[] procedureInfo() throws SQLException {
+	public  ArrayList[] procedureInfo() throws SQLException {
 
-		DBMetaInfo dbmetaProced = new DBMetaInfo();
+		DBMetaInfo dbmetaProced = new DBMetaInfo(conn);
 		rtm1 = dbmetaProced.getProcedureInfo();
 
 		if (rtm1 != null) {
@@ -214,9 +218,9 @@ public class SchemaComparisonServer {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static ArrayList[] schemaInfo(ArrayList<String> schemaHeader,ArrayList<String> schemaBody) throws SQLException {
+	public ArrayList[] schemaInfo(ArrayList<String> schemaHeader,ArrayList<String> schemaBody) throws SQLException {
 
-		DBMetaInfo dbmetaSchema = new DBMetaInfo();
+		DBMetaInfo dbmetaSchema = new DBMetaInfo(conn);
 		rtm2 = dbmetaSchema.getSchemaInfo();
 
 		if (rtm2 != null) {

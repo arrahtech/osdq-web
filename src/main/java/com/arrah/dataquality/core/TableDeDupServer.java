@@ -6,29 +6,34 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
 public class TableDeDupServer {
 
-	static ArrayList<String> header;
-	static ArrayList<String> body;
+	ArrayList<String> header;
+	ArrayList<String> body;
 
-	public static ArrayList<String> getHeader() {
+	private Rdbms_NewConn conn = null;
+	public TableDeDupServer(Rdbms_NewConn conn) {
+	  this.conn = conn;
+	}
+	
+	public ArrayList<String> getHeader() {
 		return header;
 	}
 
-	public static void setHeader(ArrayList<String> header) {
-		TableDeDupServer.header = header;
+	public void setHeader(ArrayList<String> header) {
+		this.header = header;
 	}
 
-	public static ArrayList<String> getBody() {
+	public ArrayList<String> getBody() {
 		return body;
 	}
 
-	public static void setBody(ArrayList<String> body) {
-		TableDeDupServer.body = body;
+	public void setBody(ArrayList<String> body) {
+		this.body = body;
 	}
 
 	/**
@@ -37,7 +42,7 @@ public class TableDeDupServer {
 	 * @param title name of the table for which the duplicate info is to be fetched.
 	 * @throws SQLException
 	 */
-	public static void getTableDeDupInfo(String title)
+	public void getTableDeDupInfo(String title)
 			throws SQLException {
 		
 		header = new ArrayList<String>();
@@ -47,20 +52,18 @@ public class TableDeDupServer {
 
 		Map<String, Double> dupInfo;
 		int[] emptyCount;
-		String dbType = Rdbms_conn.getDBType();
-		String dsn = Rdbms_conn.getHValue("Database_DSN");
-		QueryBuilder stats = new QueryBuilder(dsn, title, dbType);
+		QueryBuilder stats = new QueryBuilder(conn, title);
 		String s1 = stats.getTableAllQuery();
 
 		
-		resultset = Rdbms_conn.runQuery(s1, 20);
+		resultset = conn.runQuery(s1, 20);
 		
-
-		_rtm = ResultsetToRTM.getSQLValue(resultset, true);
+		ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+		_rtm = resultsetToRTM.getSQLValue(resultset, true);
 		int colc = _rtm.getModel().getColumnCount();
 		
 
-		TableFirstInformation tfInfo = new TableFirstInformation();
+		TableFirstInformation tfInfo = new TableFirstInformation(conn);
 		dupInfo = tfInfo.getTableProfile(title);
 
 		for (Entry<String, Double> entry : dupInfo.entrySet()) {
@@ -82,7 +85,5 @@ public class TableDeDupServer {
 		}
 		setBody(body);
 		resultset.close();
-		Rdbms_conn.closeConn();
-
 	}
 }

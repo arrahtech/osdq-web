@@ -1,11 +1,13 @@
 package com.arrah.dataquality.core;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 
 @XmlRootElement
@@ -13,7 +15,6 @@ import com.arrah.framework.dataquality.ReportTableModel;
 
 public class DataTypeMetadata {
 	ReportTableModel rtm;
-	String dbstr;
 	
 	
 	ArrayList<String> header;
@@ -26,8 +27,7 @@ public class DataTypeMetadata {
 	}
 	
 	public DataTypeMetadata(String dbstr) {
-		this.dbstr = dbstr;
-		getDataTypeMetaData();
+		getDataTypeMetaData(dbstr);
 	}
 	
 	@XmlElement
@@ -51,12 +51,12 @@ public class DataTypeMetadata {
 	
 	
 	
-	public void getDataTypeMetaData(){
-
+	public void getDataTypeMetaData(String dbstr){
+	  Rdbms_NewConn conn = null;
 		try{
-		 ConnectionString.Connection(dbstr);
-		 DBMetaInfo dbm = new DBMetaInfo();
-		 rtm = dbm.getStandardSQLInfo();
+		 conn = new Rdbms_NewConn(dbstr);
+		 DBMetaInfo dbm = new DBMetaInfo(conn);
+		 rtm = dbm.getStandardSQLInfo(conn);
 					
 		 if (rtm != null) {
 				int rowc = rtm.getModel().getRowCount();
@@ -86,6 +86,15 @@ public class DataTypeMetadata {
 		}
 		catch(Exception e){
 			e.getLocalizedMessage();
+		} finally {
+		  if (conn != null) {
+		    try {
+          conn.closeConn();
+        } catch (SQLException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+		  }
 		}
 	}
 		

@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.arrah.framework.dataquality.ReportTableModel;
 import com.arrah.framework.dataquality.ResultsetToRTM;
 
@@ -33,9 +33,9 @@ public class Merge {
 		private String endValue;
 		private ArrayList<String>  header;
 		private ArrayList<Row>  body;
-		private Hashtable<String, String> _fileParse;
-		private String dbstr;
 		private String type = "multi";
+		
+		private Rdbms_NewConn conn;
 	
 		@XmlElement
 		public String getTitle() {
@@ -53,24 +53,24 @@ public class Merge {
 		}
 		
 		//fuzzy
-		public Merge (String _dbstr, String _param, String _paramValue) throws SQLException {
-			dbstr = _dbstr;
+		public Merge (String _dbstr, String _param, String _paramValue) throws Exception {
+			conn = new Rdbms_NewConn(_dbstr);
 			type = "fuzzy";
 			param = _param;
 			paramValue = _paramValue;
 		}
 	
 		//range
-		public Merge (String _dbstr, String _param, String _startValue, String _endValue) throws SQLException {
-			dbstr = _dbstr;
+		public Merge (String _dbstr, String _param, String _startValue, String _endValue) throws Exception {
+		  conn = new Rdbms_NewConn(_dbstr);
 			type = "range";
 			param = _param;
 			startValue = _startValue;
 			endValue = _endValue;	
 		}
 		
-		public Merge (String _dbstr) throws SQLException {
-			dbstr = _dbstr;
+		public Merge (String _dbstr) throws Exception {
+		  conn = new Rdbms_NewConn(_dbstr);
 		}
 		
 		public Merge () {}
@@ -78,50 +78,7 @@ public class Merge {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void merger() throws SQLException{
 		
-		_fileParse = new Hashtable<String,String>();
-        _fileParse.put("Database_Type","");
-        _fileParse.put("Database_Driver","");
-        _fileParse.put("Database_Protocol","");
-        _fileParse.put("Database_DSN","");
-        _fileParse.put("Database_User","");
-        _fileParse.put("Database_Passwd","");
-        _fileParse.put("Database_Catalog","");
-        _fileParse.put("Database_SchemaPattern","");
-        _fileParse.put("Database_TablePattern","");
-        _fileParse.put("Database_ColumnPattern","");
-        _fileParse.put("Database_TableType","TABLE");
-        
-        String[] para = dbstr.split("/");
-        _fileParse.put("Database_Type",para[0]);
-        _fileParse.put("Database_Driver",para[1]);
-       
-        String[] para1 = para[2].split("~");
-        para[2] = para1[0].concat(":").concat(para1[1]);
-        
-        String[] para2 = para[3].split("~");
-        if(para[0].equalsIgnoreCase("sql_server")){
-        	para[3] = para2[0].concat("//").concat(para2[1]).concat(":").concat(para2[2]).concat(";databaseName=").concat(para2[3]);
-        } 
-        else{
-        	para[3] = para2[0].concat("//").concat(para2[1]).concat(":").concat(para2[2]).concat("/").concat(para2[3]);
-        }
-        //para[3] = para2[0].concat("//").concat(para2[1]).concat("/").concat(para2[2]);
-        
-        _fileParse.put("Database_Protocol",para[2]);   
-        _fileParse.put("Database_DSN",para[3]);
-        _fileParse.put("Database_User",para[4]);
-        _fileParse.put("Database_Passwd",para[5]);
-
-
-     Rdbms_conn.init(_fileParse);
-     try {
-  		Class.forName(para[1]);
-  	} catch (ClassNotFoundException e) {
-  		e.printStackTrace();
-  	}
-     _fileParse.put("Database_DSN",para2[2]);
-     
-     	Rdbms_conn.openConn();
+     	conn.openConn();
      	  	
      	ArrayList<String> query = new ArrayList<String>();
      	ArrayList<String> tableNames = new ArrayList<String>();
@@ -129,20 +86,20 @@ public class Merge {
      	tableNames.add("employee1");
      	tableNames.add("employee2");
      	
-     	if(para[0].equalsIgnoreCase("Mysql")){
+     	if(conn.getDBType().equalsIgnoreCase("Mysql")){
 
 	 		for(int i=0; i<tableNames.size(); i++){
 	 			query.add("SELECT * FROM ".concat(tableNames.get(i)));
 	 		}
 		}
  		
-		if(para[0].equalsIgnoreCase("Postgres")){
+		if(conn.getDBType().equalsIgnoreCase("Postgres")){
 			
 
 		
 		}
 			
-		if(para[0].equalsIgnoreCase("SqlServer")){
+		if(conn.getDBType().equalsIgnoreCase("SqlServer")){
 		
 			
 		}	
@@ -152,8 +109,9 @@ public class Merge {
 		
 		for(int i=0; i<query.size(); i++){
 		
-			resultset.add(Rdbms_conn.runQuery(query.get(i), 20));
-			_rtm.add(ResultsetToRTM.getSQLValue(resultset.get(i), true));
+			resultset.add(conn.runQuery(query.get(i), 20));
+			ResultsetToRTM resultsetToRTM = new ResultsetToRTM(conn);
+			_rtm.add(resultsetToRTM.getSQLValue(resultset.get(i), true));
 		}
 		
 		// header/column names
@@ -297,8 +255,9 @@ public class Merge {
 		
 		
 		LOGGER.debug("query executed successfully!");
-		
-		Rdbms_conn.closeConn();	           
+		if (conn != null) {
+		  conn.closeConn();	           
+		}
 	    
 	}
 	

@@ -10,13 +10,12 @@ import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 
 @XmlRootElement
 @XmlType(propOrder = { "title", "header", "body" })
 public class TableDeDup {
 	private String title;
-	private String dbstr;
 	private ArrayList<String> header;
 	private ArrayList<String> body;
 
@@ -27,15 +26,13 @@ public class TableDeDup {
 
 	}
 
-	public TableDeDup(String _table, String _dbstr) throws SQLException {
+	public TableDeDup(String _table, String dbConnectionURI) throws SQLException {
 		title = _table;
-		dbstr = _dbstr;
-		getDeDupInfo();
+		getDeDupInfo(dbConnectionURI);
 	}
 
-	public TableDeDup(String _dbstr) throws SQLException {
-		dbstr = _dbstr;
-		getDeDupInfo();
+	public TableDeDup(String dbConnectionURI) throws SQLException {
+		getDeDupInfo(dbConnectionURI);
 	}
 
 	@XmlElement
@@ -60,17 +57,20 @@ public class TableDeDup {
 	 * @throws SQLException
 	 */
 
-	private void getDeDupInfo() {
-		try {
-			ConnectionString.Connection(dbstr);
-			TableDeDupServer.getTableDeDupInfo(title);
-			header = TableDeDupServer.getHeader();
-			body = TableDeDupServer.getBody();
+	private void getDeDupInfo(String dbConnectionURI) {
+		Rdbms_NewConn conn = null;
+	  try {
+		  conn = new Rdbms_NewConn(dbConnectionURI);
+		  TableDeDupServer deDupServer = new TableDeDupServer(conn); 
+		  deDupServer.getTableDeDupInfo(title);
+			header = deDupServer.getHeader();
+			body = deDupServer.getBody();
+			//TODO: dedupInfo
 		} catch (Exception se) {
 			LOGGER.error("Error printing de-dup values", se);
 		} finally {
 			try {
-				Rdbms_conn.closeConn();
+				conn.closeConn();
 			} catch (Exception e) {
 				e.getLocalizedMessage();
 			}

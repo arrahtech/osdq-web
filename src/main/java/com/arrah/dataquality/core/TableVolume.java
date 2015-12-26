@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.arrah.framework.dataquality.Rdbms_NewConn;
+
 @XmlRootElement
 public class TableVolume {
 	
@@ -33,14 +35,13 @@ public class TableVolume {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void getTable_Volume(String dbStr, String table) throws SQLException {
-
+	  Rdbms_NewConn conn;
 		try {
-			ConnectionString.Connection(dbStr);
-			ArrayList[] values = TableVolumeServer.getTableVolumeValues(table);
+		  conn = new Rdbms_NewConn(dbStr);
+			ArrayList[] values = TableVolumeServer.getTableVolumeValues(conn, table);
 			header = values[0];
 			body = values[1];
-		} catch (NullPointerException e) {
-			
+		} catch (Exception e) {
 			LOGGER.error(e.getLocalizedMessage());
 		}
 	}

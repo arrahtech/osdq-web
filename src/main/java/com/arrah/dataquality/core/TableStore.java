@@ -30,9 +30,7 @@ public class TableStore {
   private void getnames(String dbConnectionURI) throws SQLException {
     // ConnectionString.Connection(dbStr);
     try {
-      DBConnectionConfiguration dbConnectionConfiguration = DBConnectionUriParser
-          .parse(dbConnectionURI);
-      Rdbms_NewConn conn = new Rdbms_NewConn(dbConnectionConfiguration);
+      Rdbms_NewConn conn = new Rdbms_NewConn(dbConnectionURI);
       conn.openConn();
       DatabaseMetaData md = conn.getMetaData();
       ResultSet resultSet = md.getTables(null, null, null,

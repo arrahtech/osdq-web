@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
-import com.arrah.framework.dataquality.Rdbms_conn;
+import com.arrah.framework.dataquality.Rdbms_NewConn;
 import com.itextpdf.text.DocumentException;
 
 public class DataDictionaryServer {
@@ -21,13 +21,14 @@ public class DataDictionaryServer {
 	 * @throws DocumentException
 	 */
 
-	public static void createDataDictionary(OutputStream output) {
+	public static void createDataDictionary(Rdbms_NewConn conn, OutputStream output) {
 
 		try {
-			Rdbms_conn
-					.populateTable(null, null, null, new String[] { "TABLE" });
+		  //TODO: 
+//			conn
+//					.populateTable(null, null, null, new String[] { "TABLE" });
 
-			DataDictionaryPDF dataPDF = new DataDictionaryPDF();
+			DataDictionaryPDF dataPDF = new DataDictionaryPDF(conn);
 
 			try {
 				dataPDF.createDDPDF(output);
@@ -38,14 +39,7 @@ public class DataDictionaryServer {
 
 		} catch (Exception e) {
 			e.getLocalizedMessage();
-		} finally {
-			try {
-				Rdbms_conn.closeConn();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
+		} 
 	}
 
 }

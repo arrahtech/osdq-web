@@ -26,7 +26,7 @@ public class FirstInformation {
 	private static String minVal = "";
 	private static String maxVal = "";
 
-	public static double[] getProfileValues(QueryBuilder querybuilder) {
+	public static double[] getProfileValues(Rdbms_NewConn conn, QueryBuilder querybuilder) {
 		String s = querybuilder.count_query_w(false, "row_count");
 		String s1 = querybuilder.count_query_w(true, "row_count");
 		String s2 = querybuilder.get_nullCount_query_w("Null");
@@ -40,33 +40,25 @@ public class FirstInformation {
 		double d4 = 0.0D;
 		double d5 = 0.0D;
 		Object obj = null;
+		ResultSet resultset;
 		try {
-			Rdbms_conn.openConn();
-		} catch (SQLException sqlexception) {
-			System.out.println("\n Error: Could not open Connection");
-			return null;
-		}
-		try {
-			ResultSet resultset;
-			for (resultset = Rdbms_conn.runQuery(s); resultset.next();)
+			for (resultset = conn.runQuery(s); resultset.next();)
 				d = resultset.getDouble("row_count");
-
 			resultset.close();
 		} catch (SQLException sqlexception1) {
 			d = -1D;
 		}
 		try {
 			ResultSet resultset1;
-			for (resultset1 = Rdbms_conn.runQuery(s1); resultset1.next();)
+			for (resultset1 = conn.runQuery(s1); resultset1.next();)
 				d1 = resultset1.getDouble("row_count");
-
 			resultset1.close();
 		} catch (SQLException sqlexception2) {
 			d1 = -1D;
 		}
 		try {
 			ResultSet resultset2;
-			for (resultset2 = Rdbms_conn.runQuery(s2); resultset2.next();)
+			for (resultset2 = conn.runQuery(s2); resultset2.next();)
 				d2 = resultset2.getDouble("equal_count");
 
 			resultset2.close();
@@ -75,31 +67,25 @@ public class FirstInformation {
 		}
 		try {
 			ResultSet resultset3;
-			for (resultset3 = Rdbms_conn.runQuery(s5); resultset3.next();)
+			for (resultset3 = conn.runQuery(s5); resultset3.next();)
 				d5 = resultset3.getDouble("row_count");
 
 			resultset3.close();
 		} catch (SQLException sqlexception4) {
 			d5 = -1D;
 		}
-		try {
-			Rdbms_conn.closeConn();
-		} catch (SQLException sqlexception5) {
-			System.out.println("\n Warning: Could not close Connection");
-		}
 		return  (new double[] { d, d1, d1 != -1D ? d - d1 : -1D, d5, d2 });
 	}
 
-	public static Vector[] getPatternValues(QueryBuilder querybuilder) {
+	public static Vector[] getPatternValues(Rdbms_NewConn conn, QueryBuilder querybuilder) {
 		String s = querybuilder.get_freq_query();
 		int i = 0;
 		Vector avector[] = new Vector[2];
 		avector[0] = new Vector<String>();
 		avector[1] = new Vector<Double>();
 		try {
-			Rdbms_conn.openConn();
 			ResultSet resultset;
-			resultset = Rdbms_conn.runQuery(s);
+			resultset = conn.runQuery(s);
 			if (resultset == null)
 				return null;
 			while (resultset.next()) {
@@ -113,7 +99,7 @@ public class FirstInformation {
 			}
 			if (resultset != null)
 				resultset.close();
-			Rdbms_conn.closeConn();
+			conn.closeConn();
 		} catch (SQLException sqlexception) {
 			ConsoleFrame.addText("\n Warning: Could not Get Pattern Information");
 			System.out.println("Warning:"+sqlexception.getMessage());
@@ -122,7 +108,7 @@ public class FirstInformation {
 		return avector;
 	}
 
-	public static Vector[] getDistributionValues(QueryBuilder querybuilder) {
+	public static Vector[] getDistributionValues(Rdbms_NewConn conn, QueryBuilder querybuilder) {
 		minVal="" ; maxVal = "";
 		String s;
 		String s1;
@@ -136,9 +122,8 @@ public class FirstInformation {
 		double d;
 		d = 0.0D;
 		try {
-			Rdbms_conn.openConn();
-			ResultSet resultset;
-			for (resultset = Rdbms_conn.runQuery(s1); resultset.next();)
+			ResultSet resultset = null;
+			for (resultset = conn.runQuery(s1); resultset.next();)
 				d = resultset.getDouble("row_count");
 
 			resultset.close();
@@ -149,7 +134,7 @@ public class FirstInformation {
 			double d2 = 0.0D;
 			double d3 = 0.0D;
 			ResultSet resultset1;
-			for (resultset1 = Rdbms_conn.runQuery(s); resultset1.next();) {
+			for (resultset1 = conn.runQuery(s); resultset1.next();) {
 				d--;
 				if (d1 < 1.0D) {
 					double d4 = resultset1.getDouble("row_count");
@@ -180,9 +165,7 @@ public class FirstInformation {
 					}
 				}
 			}
-
 			resultset1.close();
-			Rdbms_conn.closeConn();
 		} catch (SQLException sqlexception) {
 			System.out
 					.println("\n Error: Could not Get Distribution Information");
