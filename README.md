@@ -8,7 +8,7 @@
   2. `mvn package`
   3. Copy osdq.war to your favourite web container like jetty or tomcat
   4. If you are simply testing, just run `mvn jetty:run` 
-  5. Open *http://localhost:8080/osdq/api-explorere*
+  5. Open *http://localhost:8080/osdq/api-explorer/*
 
 
 We are just starting off, gradually we will add additional details at our [wiki] (https://github.com/arrahtec/osdqrest/wiki)
