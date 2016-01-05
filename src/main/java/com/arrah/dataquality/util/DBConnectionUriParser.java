@@ -16,29 +16,43 @@ public class DBConnectionUriParser {
 
   private static HashMap<String, String[]> uriScheme2ProtocolDriverMapping = new HashMap<>(
       1);
-  
 
   /**
    * Add all the mapping from scheme to jdbc-scheme
    */
   static {
-    uriScheme2ProtocolDriverMapping.put("oracle", new String[] {"jdbc:oracle:native", "oracle.jdbc.OracleDriver"});
-    uriScheme2ProtocolDriverMapping.put("splice", new String[] {"jdbc:derby", "org.apache.derby.jdbc.ClientDriver"});
-    uriScheme2ProtocolDriverMapping.put("mysql", new String[] {"jdbc:mysql", "com.mysql.jdbc.Driver"});
-    uriScheme2ProtocolDriverMapping.put("informix", new String[] {"jdbc:informix-sqli", "com.informix.jdbc.IfxDriver"});
-    uriScheme2ProtocolDriverMapping.put("hive2", new String[] {"jdbc:hive2", "org.apache.hive.jdbc.HiveDriver"});
-    uriScheme2ProtocolDriverMapping.put("hive", new String[] {"jdbc:hive", "org.apache.hadoop.hive.jdbc.HiveDriver"});
-    uriScheme2ProtocolDriverMapping.put("db2", new String[] {"jdbc:db2", "com.ibm.db2.jcc.DB2Driver"});
-    uriScheme2ProtocolDriverMapping.put("postgresql", new String[] {"jdbc:postgresql", "org.postgresql.Driver"});
-    uriScheme2ProtocolDriverMapping.put("ucanaccess", new String[] {"jdbc:ucanaccess", "net.ucanaccess.jdbc.UcanaccessDriver"});
-    uriScheme2ProtocolDriverMapping.put("sqlserver", new String[] {"jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"});
+    uriScheme2ProtocolDriverMapping.put("oracle",
+        new String[] { "jdbc:oracle:native", "oracle.jdbc.OracleDriver" });
+    uriScheme2ProtocolDriverMapping.put("derby",
+        new String[] { "jdbc:derby", "org.apache.derby.jdbc.ClientDriver" });
+    uriScheme2ProtocolDriverMapping.put("mysql",
+        new String[] { "jdbc:mysql", "com.mysql.jdbc.Driver" });
+    uriScheme2ProtocolDriverMapping.put("informix",
+        new String[] { "jdbc:informix-sqli", "com.informix.jdbc.IfxDriver" });
+    uriScheme2ProtocolDriverMapping.put("hive2",
+        new String[] { "jdbc:hive2", "org.apache.hive.jdbc.HiveDriver" });
+    uriScheme2ProtocolDriverMapping.put("hive",
+        new String[] { "jdbc:hive", "org.apache.hadoop.hive.jdbc.HiveDriver" });
+    uriScheme2ProtocolDriverMapping.put("db2",
+        new String[] { "jdbc:db2", "com.ibm.db2.jcc.DB2Driver" });
+    uriScheme2ProtocolDriverMapping.put("postgresql",
+        new String[] { "jdbc:postgresql", "org.postgresql.Driver" });
+    uriScheme2ProtocolDriverMapping.put("ucanaccess", new String[] {
+        "jdbc:ucanaccess", "net.ucanaccess.jdbc.UcanaccessDriver" });
+    uriScheme2ProtocolDriverMapping.put("sqlserver", new String[] {
+        "jdbc:sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver" });
 
-    /* In server mode, do we need odbc? I think, No!!
+    /*
+     * In server mode, do we need odbc? I think, No!!
      * 
-    uriScheme2ProtocolDriverMapping.put("mysql-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
-    uriScheme2ProtocolDriverMapping.put("msaccess-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
-    uriScheme2ProtocolDriverMapping.put("sqlserver-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
-    uriScheme2ProtocolDriverMapping.put("oracle-odbc", new String[] {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+     * uriScheme2ProtocolDriverMapping.put("mysql-odbc", new String[]
+     * {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+     * uriScheme2ProtocolDriverMapping.put("msaccess-odbc", new String[]
+     * {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+     * uriScheme2ProtocolDriverMapping.put("sqlserver-odbc", new String[]
+     * {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
+     * uriScheme2ProtocolDriverMapping.put("oracle-odbc", new String[]
+     * {"jdbc:odbc", "sun.jdbc.odbc.JdbcOdbcDriver"});
      */
   }
 
@@ -70,10 +84,11 @@ public class DBConnectionUriParser {
           .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
           .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
       // Prepare JDBC URL specific to mysql jdbc Driver
-      jdbcURL = new StringBuilder(uriScheme2ProtocolDriverMapping.get(scheme)[0]);
-      jdbcURL.append("://").append(host).append(":").append(port)
-      .append(path);
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port).append(path);
       if (query != null) {
+        jdbcURL.append(";");
         String[] queryParams = query.split("&");
         for (int i = 0; i < queryParams.length; i++) {
           String[] keyValue = queryParams[i].split("=");
@@ -88,8 +103,221 @@ public class DBConnectionUriParser {
       dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
       break;
     case "derby":
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to derby jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port).append(path);
+      if (query != null) {
+        jdbcURL.append(";");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append(";");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
       break;
     case "oracle-thin":
+      //jdbc:oracle:<drivertype>:<user>/<password>@<database>
+      //jdbc:oracle:thin:scott/tiger@myhost:1521:orcl
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to derby jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append(":@").append(host).append(":").append(port).append(":").append(path);
+      if (query != null) {
+        jdbcURL.append(";");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append("&");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
+      break;
+    case "sqlserver":
+      //jdbc:sqlserver://localhost;user=MyUserName;password=*****;
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to derby jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port);
+      if (path != null) {
+        //this will be database name in case of sqlserver
+        jdbcURL.append(";databaseName=").append(path);
+      }
+      if (query != null) {
+        jdbcURL.append(";");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append(";");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
+      break;
+    case "db2":
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to mysql jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port).append(path);
+      if (query != null) {
+        jdbcURL.append(":");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append(";");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
+      break;
+    case "ucanaccess":
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to mysql jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(path);
+      if (query != null) {
+        jdbcURL.append(";");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append("&");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
+      break;
+    case "postgres":
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to mysql jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port).append(path);
+      if (query != null) {
+        jdbcURL.append("?");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append("&");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
+      break;
+    case "informix":
+      dbConnectionConfigurationBuilder.setHost(host).setPort(port)
+          .setDatabase(path);
+      if (userinfo != null) {
+        String[] usernamePassword = userinfo.split(":");
+        dbConnectionConfigurationBuilder.setUsername(usernamePassword[0])
+            .setPassword(usernamePassword[1]);
+      }
+      dbConnectionConfigurationBuilder
+          .setDatabaseProtocol(uriScheme2ProtocolDriverMapping.get(scheme)[0])
+          .setJDBCDriver(uriScheme2ProtocolDriverMapping.get(scheme)[1]);
+      // Prepare JDBC URL specific to mysql jdbc Driver
+      jdbcURL = new StringBuilder(
+          uriScheme2ProtocolDriverMapping.get(scheme)[0]);
+      jdbcURL.append("://").append(host).append(":").append(port).append(path);
+      if (query != null) {
+        jdbcURL.append(":");
+        String[] queryParams = query.split("&");
+        for (int i = 0; i < queryParams.length; i++) {
+          String[] keyValue = queryParams[i].split("=");
+          dbConnectionConfigurationBuilder.setParam(keyValue[0], keyValue[1]);
+          jdbcURL.append(keyValue[0]).append("=").append(keyValue[1]);
+          if (i < queryParams.length - 1) {
+            jdbcURL.append(";");
+          }
+        }
+      }
+      dbConnectionConfigurationBuilder.setJdbcURL(jdbcURL.toString());
+      dbConnectionConfiguration = dbConnectionConfigurationBuilder.build();
       break;
     default:
 
