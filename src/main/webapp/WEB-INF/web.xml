@@ -15,7 +15,7 @@
 		</init-param>
 		<init-param>
 			<param-name>swagger.api.basepath</param-name>
-			<param-value>http://localhost:8080/osdq/webapi</param-value>
+			<param-value>http://52.91.253.13:8080/osdq/webapi</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
