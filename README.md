@@ -14,7 +14,7 @@ Please note the auth service is dummy. The APIs are currently protected using HT
 
 Also please note the api base url is hard coded at `WEB-INF/web.xml`, the same should be updated if you are planning to deploy this service and access over network.
 
->> If you are deploying war file, please make sure update above file and then build war file using mvn package. 
+> If you are deploying war file, please make sure to update above files and then build war file using mvn package.
 
 
 We are just starting off, gradually we will add additional details here and at [http://arrahtec.github.io/osdqrest](homepage)
