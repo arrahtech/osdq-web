@@ -2,6 +2,9 @@
 
   This is sister project for https://github.com/arrahtec/profiler. It provides Restful APIs for features for data quality and data preparation features. This project will help projects which want embed data quality and data preparation features in their project or UI using restful calls.
 
+> This is pre-beta release tested against mysql database. Other database like oracle, postgres, derby, informix might also
+> work (not tested), please report issue if its not working. 
+
 
 ## Getting started
   1. `git clone git@github.com:arrahtec/osdqrest.git`
