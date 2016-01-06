@@ -20,4 +20,4 @@ Also please note the api base url is hard coded at `WEB-INF/web.xml`, the same s
 > If you are deploying war file, please make sure to update above files and then build war file using mvn package.
 
 
-We are just starting off, gradually we will add additional details here and at [http://arrahtec.github.io/osdqrest](homepage)
+We are just starting off, gradually we will add additional details on this page and at our [http://arrahtec.github.io/osdqrest/](homepage)
