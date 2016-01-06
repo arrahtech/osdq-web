@@ -12,7 +12,7 @@
 </title>
 </head>
 <body>
-    <h2>Look at our service definition!</h2>
-    <p><a href="api-explorer/">Look at our service definition!</a>
+    <h2>Look at osdq service definition!</h2>
+    <p><a href="api-explorer/">Look at osdq service definition!</a>
 </body>
 </html>
