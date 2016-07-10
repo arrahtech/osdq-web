@@ -104,7 +104,7 @@ public class ReportTableModel implements Serializable, Cloneable {
 		addRows(data);
 
 		createTable(false);
-	};
+	}
 
 	private void createTable(final boolean isEditable) {
 		_isEditable = isEditable;
@@ -120,11 +120,8 @@ public class ReportTableModel implements Serializable, Cloneable {
 					return true;
 				}
 				else { // isEditable False
-					if (colN.endsWith("Editable") == true ) {
-						return true;
-					} else  { // colN.endsWith("Editable") not true
-						return false;
-					}
+					// colN.endsWith("Editable") not true
+					return colN.endsWith("Editable") == true;
 				}
 			} // end of isCellEditable
 
@@ -160,14 +157,14 @@ public class ReportTableModel implements Serializable, Cloneable {
 	private void addColumns(String[] colName) {
 		int i;
 		for (i = 0; i < colName.length; i++)
-			column_v.addElement((String) colName[i]);
+			column_v.addElement(colName[i]);
 		col_size = i;
 	}
 
 	private void addColumns(Object[] colName) {
 		int i;
 		for (i = 0; i < colName.length; i++)
-			column_v.addElement((String) colName[i].toString());
+			column_v.addElement(colName[i].toString());
 		col_size = i;
 	}
 
@@ -175,7 +172,7 @@ public class ReportTableModel implements Serializable, Cloneable {
 		for (int i = 0; i < rowData.length; i++) {
 			Vector<String> newRow = new Vector<String>();
 			for (int j = 0; j < rowData[i].length; j++)
-				newRow.addElement((String) rowData[i][j]);
+				newRow.addElement(rowData[i][j]);
 			row_v.addElement(newRow);
 		}
 	}
@@ -183,7 +180,7 @@ public class ReportTableModel implements Serializable, Cloneable {
 	public void addFillRow(String[] rowset) {
 		Vector<String> newRow = new Vector<String>();
 		for (int j = 0; j < rowset.length; j++)
-			newRow.addElement((String) rowset[j]);
+			newRow.addElement(rowset[j]);
 
 		row_v.addElement(newRow);
 		tabModel.fireTableRowsInserted(tabModel.getRowCount(),1);
@@ -208,7 +205,7 @@ public class ReportTableModel implements Serializable, Cloneable {
 	public void addRow() {
 		Vector<String> newRow = new Vector<String>();
 		for (int j = 0; j < col_size; j++)
-			newRow.addElement((String) "");
+			newRow.addElement("");
 
 		row_v.addElement(newRow);
 

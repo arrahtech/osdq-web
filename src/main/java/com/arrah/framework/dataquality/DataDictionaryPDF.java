@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Vector;
 
-import com.arrah.dataquality.core.DBMetaInfo;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;

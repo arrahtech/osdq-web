@@ -43,11 +43,11 @@ public class TableRelationInfo {
 	public int level = 0; // 0 for rootLeval , 1 for children level one
 
 	public TableRelationInfo() {
-	};
+	}
 
 	public TableRelationInfo(String t_name) {
 		tableName = t_name;
-	};
+	}
 
 	public void print_table() {
 		System.out.println("\n ___ " + tableName + " ____");

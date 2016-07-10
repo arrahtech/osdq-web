@@ -1,42 +1,32 @@
 package com.arrah.framework.dataquality;
 
+import com.arrahtec.dataquality.util.DBConnectionConfiguration;
+import com.arrahtec.dataquality.util.DBConnectionUriParser;
+
 import java.net.URISyntaxException;
-
-/***********************************************
- *     Copyright to Vivek Kumar Singh          *
- *                                             *
- *                                             *
- * Any part of code or file can be changed,    *
- * redistributed, modified with the copyright  *
- * information intact                          *
- *                                             *
- * Author$ : Vivek Singh                       *
- *                                             *
- ***********************************************/
-
-/*
- * This is a utility class for New Database connection  
- * running SQL and fetching data 
- * This class will not have static functions
- * 
- *
- */
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.arrah.dataquality.util.DBConnectionConfiguration;
-import com.arrah.dataquality.util.DBConnectionUriParser;
+/***********************************************
+ * Copyright to Vivek Kumar Singh          *
+ * *
+ * *
+ * Any part of code or file can be changed,    *
+ * redistributed, modified with the copyright  *
+ * information intact                          *
+ * *
+ * Author$ : Vivek Singh                       *
+ * *
+ ***********************************************/
+/*
+ * This is a utility class for New Database connection
+ * running SQL and fetching data
+ * This class will not have static functions
+ *
+ *
+ */
 
 public class Rdbms_NewConn {
 	private  Connection conn;
@@ -265,13 +255,13 @@ public class Rdbms_NewConn {
 
 	private void init(Hashtable<String, String> hashtable)
 			throws SQLException {
-		_d_type = (String) hashtable.get("Database_Type");
-		_d_dsn = (String) hashtable.get("Database_DSN");
-		__d_protocol = (String) hashtable.get("Database_Protocol");
-		_d_driver = (String) hashtable.get("Database_Driver");
-		_d_user = (String) hashtable.get("Database_User");
-		_d_passwd = (String) hashtable.get("Database_Passwd");
-		_d_url = (String) hashtable.get("Database_JDBC");
+		_d_type = hashtable.get("Database_Type");
+		_d_dsn = hashtable.get("Database_DSN");
+		__d_protocol = hashtable.get("Database_Protocol");
+		_d_driver = hashtable.get("Database_Driver");
+		_d_user = hashtable.get("Database_User");
+		_d_passwd = hashtable.get("Database_Passwd");
+		_d_url = hashtable.get("Database_JDBC");
 		_h = hashtable;
 		table_v = new Vector<String>();
 		tableDesc_v = new Vector<String>();
@@ -287,11 +277,11 @@ public class Rdbms_NewConn {
 	}
 
 	public  String getHValue(String s) {
-		return (String) _h.get(s);
+		return _h.get(s);
 	}
 
 	public  String setHValue(String key, String value) {
-		return (String) _h.put(key, value);
+		return _h.put(key, value);
 	}
 
 	public  String checkAndReturnSql(String s) throws SQLException {
@@ -318,10 +308,10 @@ public class Rdbms_NewConn {
 
 	public  void populateTable( ) throws SQLException {
 		/** Get New connection and populate tables **/
-		String s = (String) _h.get("Database_SchemaPattern");
-		String s1 = (String) _h.get("Database_TablePattern");
-		String s2 = (String) _h.get("Database_TableType");
-		String s3 = (String) _h.get("Database_Catalog");
+		String s = _h.get("Database_SchemaPattern");
+		String s1 = _h.get("Database_TablePattern");
+		String s2 = _h.get("Database_TableType");
+		String s3 = _h.get("Database_Catalog");
 		s3 = "";
 		if (s == null || "".equals(s)) s= null;
 		if (s3 == null || "".equals(s3)) s3 = null;
@@ -352,9 +342,9 @@ public class Rdbms_NewConn {
 		avector[1] = new Vector<Integer>();
 		
 		/** Get New connection and populate tables **/
-		String s = (String) _h.get("Database_SchemaPattern");
-		String s1 = (String) _h.get("Database_TablePattern");
-		String s3 = (String) _h.get("Database_Catalog");
+		String s = _h.get("Database_SchemaPattern");
+		String s1 = _h.get("Database_TablePattern");
+		String s3 = _h.get("Database_Catalog");
 		s3 = "";
 		if (s == null || "".equals(s)) s= null;
 		if (s3 == null || "".equals(s3)) s3 = null;

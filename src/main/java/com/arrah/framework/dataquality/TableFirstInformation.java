@@ -17,12 +17,12 @@ package com.arrah.framework.dataquality;
  * 
  */
 
+import com.arrahtec.dataquality.core.FillCheck;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
-
-import com.arrah.dataquality.core.FillCheck;
 
 
 public class TableFirstInformation {

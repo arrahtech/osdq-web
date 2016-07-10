@@ -4,14 +4,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.arrahtec</groupId>
-	<artifactId>osdqrest</artifactId>
+	<artifactId>osdq-web</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1</version>
 	<name>osdqrest</name>
 
 	<url>http://arrahtec.com</url>
 	<build>
-		<finalName>osdq</finalName>
+		<finalName>osdq-web</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -48,99 +48,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>3.5</version>
-		</dependency>
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.4.0</version>
-		</dependency>
-		<!-- <dependency> <groupId>javax.sql</groupId> <artifactId>rowset</artifactId> 
-			<version>1.0.1</version> </dependency> -->
-		<dependency>
-			<groupId>saxon</groupId>
-			<artifactId>saxon</artifactId>
-			<version>6.5.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jumpmind.symmetric.jdbc</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.2-1002-jdbc4</version>
-		</dependency>
-		<!-- <dependency> <groupId>com.oracle</groupId> <artifactId>ojdbc14</artifactId> 
-			<version>10.2.0.4.0</version> </dependency> -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.24</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-			<version>3.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jexcelapi</groupId>
-			<artifactId>jxl</artifactId>
-			<version>2.6.12</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jeval</groupId>
-			<artifactId>jeval</artifactId>
-			<version>0.9.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>jcommon</artifactId>
-			<version>1.0.23</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jfree</groupId>
-			<artifactId>jfreechart</artifactId>
-			<version>1.0.19</version>
-		</dependency>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>jdmf</groupId>
-			<artifactId>jdmf</artifactId>
-			<version>0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jdmf-0.1.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.toedter</groupId>
-			<artifactId>jcalendar</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>openforecast</groupId>
-			<artifactId>openforecast</artifactId>
-			<version>0.5.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/openforcast-0.5.0.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-core</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-core</artifactId>
 			<version>1.2.4</version>
@@ -156,11 +63,21 @@
 			<version>0.6.0</version>
 		</dependency>
 		<dependency>
-  <groupId>com.stormpath.sdk</groupId>
-  <artifactId>stormpath-sdk-httpclient</artifactId>
-  <version>1.0.RC2</version>
-  <scope>runtime</scope>
-</dependency>
+  			<groupId>com.stormpath.sdk</groupId>
+  			<artifactId>stormpath-sdk-httpclient</artifactId>
+  			<version>1.0.RC2</version>
+  			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>3.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.arrahtec</groupId>
+			<artifactId>osdq-core</artifactId>
+			<version>6.1.8-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jersey.version>2.21</jersey.version>

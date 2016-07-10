@@ -24,7 +24,7 @@ import javax.swing.JButton;
 
 public class KeyBoardListener implements KeyListener {
 	public KeyBoardListener() {
-	}; // /Constructor
+	} // /Constructor
 
 	public void keyPressed(KeyEvent e) {
 

@@ -25,11 +25,11 @@ public class ColumnAttr {
 
 	// Constructor
 	public ColumnAttr() {
-	};
+	}
 
 	public ColumnAttr(int id) {
 		colId = id;
-	};
+	}
 
 	public int getType() {
 		return colType;

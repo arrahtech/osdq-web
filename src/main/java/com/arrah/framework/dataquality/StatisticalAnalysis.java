@@ -29,7 +29,7 @@ public class StatisticalAnalysis {
 	private ReportTableModel range_t = new ReportTableModel(new String[] {
 			"Range Metric", "Metric Value" });
 	private ReportTableModel perc_t = new ReportTableModel(new String[] { "Percentile %",
-			"Record Upper Value", "Samples Below" });;
+			"Record Upper Value", "Samples Below" });
 
 	private double count, sum, avg;
 	private double variance = 0, aad = 0, skew = 0, kurt = 0;

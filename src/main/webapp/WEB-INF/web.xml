@@ -29,7 +29,7 @@
 			<param-value>
 				io.swagger.jaxrs.json,
 				io.swagger.jaxrs.listing,
-				com.arrah.rest
+				com.arrahtec.rest
 			</param-value>
 		</init-param>
 	</servlet>

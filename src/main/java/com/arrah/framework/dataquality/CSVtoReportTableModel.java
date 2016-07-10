@@ -54,7 +54,7 @@ public class CSVtoReportTableModel {
 	public CSVtoReportTableModel(File fileToLoad) {
 		f = fileToLoad;
 		vc = new Vector<ColumnAttr>();
-	};
+	}
 
 	public ReportTableModel loadFileIntoTable(int is_preview) {
 		ReportTableModel showT = null;
@@ -130,7 +130,7 @@ public class CSVtoReportTableModel {
 					while (true) {
 						if (adv_fieldSelection == true) {
 							if (colI < vec_c) {
-								FIELD_SEP = ((ColumnAttr) vc.get(colI))
+								FIELD_SEP = vc.get(colI)
 										.getSep();
 								if (FIELD_SEP == null || FIELD_SEP.equals(""))
 									lastCol = true;
@@ -167,7 +167,7 @@ public class CSVtoReportTableModel {
 					while (lineIndex < lineLength) {
 						if (adv_widthSelection == true) {
 							if (colI < vec_c) {
-								colWidth = ((ColumnAttr) vc.get(colI))
+								colWidth = vc.get(colI)
 										.getWidth();
 								if (colWidth <= 0)
 									colWidth = lineLength - lineIndex;
@@ -201,7 +201,7 @@ public class CSVtoReportTableModel {
 					} else {
 						ArrayList<String> headerA = new ArrayList<String>();
 						for (int i = 0; i < vec_c; i++) {
-							cob = (ColumnAttr) vc.get(i);
+							cob = vc.get(i);
 							String headerN = cob.getName();
 							if (headerN == null || headerN.equals(""))
 								headerN = "Column " + (i + 1);

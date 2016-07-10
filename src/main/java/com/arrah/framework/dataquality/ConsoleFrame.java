@@ -29,9 +29,9 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 
 public class ConsoleFrame {
-	private static JTextArea textArea = new JTextArea();;
+	private static JTextArea textArea = new JTextArea();
 	private static JFrame frame = null;
-	private static JToolBar tbar = new JToolBar();;
+	private static JToolBar tbar = new JToolBar();
 
 	public static void hideFrame() {
 		frame.setVisible(false);
@@ -79,7 +79,7 @@ public class ConsoleFrame {
 	}
 
 	public static void addText(String text) {
-		if (text == (String)null ) return;
+		if (text == null) return;
 		textArea.insert(text, 0);
 	}
 

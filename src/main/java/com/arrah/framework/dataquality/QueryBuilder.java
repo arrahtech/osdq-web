@@ -26,17 +26,32 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.dataquality.TableMetaInfo;
+
 
 public class QueryBuilder {
-	protected String _dsn, _table, _column, _dtype;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(QueryBuilder.class);
+
+    protected String _dsn, _table, _column, _dtype;
 	protected String _table1, _column1; // for table comparison
 
 	private boolean isCond = false;
 	private String _cond_q = "";
 	private Vector<?>[] dateVar;
-	
+	String mysql = "mysql";
+	String postgres = "postgres";
+	String oracleNative = "oracle_native";
+	String msAccess = "MS_ACCESS";
+	String sqlServer = "sql_Server";
+	String db2 = "DB2";
+	String oracleOdbc = "oracle_odbc";
+
 	private Rdbms_NewConn conn = null;
 	
 
@@ -90,6 +105,20 @@ public class QueryBuilder {
 		this.conn = conn;
 	}
 
+    public String getDeleteRowQuery(){
+        String deleteQuery="";
+        if (_dtype.equalsIgnoreCase(mysql)
+                || _dtype.equalsIgnoreCase(postgres)
+                || _dtype.equalsIgnoreCase(sqlServer)
+                ||_dtype.equalsIgnoreCase(oracleNative) || _dtype.equalsIgnoreCase(db2)) {
+            deleteQuery = "DELETE FROM " + _table1 + "  where " + _cond_q;
+        }
+        else{
+            deleteQuery = "DELETE FROM " + _table1 + "  where " + _cond_q;
+        }
+        return deleteQuery;
+    }
+
 	/* Setting Comparison Table - set column dynamically */
 	public void setCTableCol(String Table, String Column) {
 		_table1 = Table;
@@ -114,6 +143,44 @@ public class QueryBuilder {
 	public String get_tableAll_query() {
 		String allTable = "SELECT * FROM " + _table;
 		return allTable;
+	}
+
+	/* Get table data in a given range of rows*/
+	public String rangeQuery(int start, int range) {
+		String rangeSelQuery = null;
+
+		// Range X Value
+		if ((_dtype.compareToIgnoreCase(oracleNative) == 0)
+				|| (_dtype.compareToIgnoreCase(oracleOdbc) == 0)
+				|| _dtype.compareToIgnoreCase(db2) == 0)
+
+		{
+			rangeSelQuery = " SELECT * FROM " + _table1;
+            rangeSelQuery += " WHERE ROWNUM BETWEEN ";
+            rangeSelQuery += start;
+            rangeSelQuery += " AND ";
+            rangeSelQuery += (start + range - 1);
+
+		} else if (_dtype.compareToIgnoreCase(mysql) == 0
+				|| _dtype.compareToIgnoreCase(postgres) == 0) {
+
+			rangeSelQuery = " SELECT * FROM " + _table1;
+            rangeSelQuery += " LIMIT ";
+            rangeSelQuery += range;
+            rangeSelQuery += " OFFSET ";
+            rangeSelQuery += start;
+		} else if (_dtype.compareToIgnoreCase(sqlServer) == 0
+				|| _dtype.compareToIgnoreCase(msAccess) == 0) {
+			rangeSelQuery = " SELECT * FROM " + _table1;
+//			range_sel_query += " OFFSET ";
+//			range_sel_query += start;
+//			range_sel_query += " ROWS ";
+//			range_sel_query += "FETCH NEXT ";
+//			range_sel_query += range;
+//			range_sel_query += " ROWS ONLY";
+		}
+
+		return rangeSelQuery;
 	}
 
 	/* Get all table values Count */
@@ -181,6 +248,22 @@ public class QueryBuilder {
 		}
 		return count_query;
 	}
+
+    public String getUpdateRowQuery(String value){
+        String updateQuery="";
+        if (_dtype.equalsIgnoreCase(mysql)
+                || _dtype.equalsIgnoreCase(postgres)
+                || _dtype.equalsIgnoreCase(sqlServer)
+                ||_dtype.equalsIgnoreCase(oracleNative)|| _dtype.equalsIgnoreCase(db2)) {
+            updateQuery = "UPDATE  " + _table1 + "  SET  " + _column1 + "="
+                    + value  + "  where  " + _cond_q;
+        }
+        else{
+            updateQuery = "UPDATE  " + _table1 + "  SET  " + _column1 + "="
+                    + value  + "  where  " + _cond_q;
+        }
+        return updateQuery;
+    }
 
 	/* Get the value of Bottom X */
 	public String bottom_query(boolean distinct, String col_name, String num) {
@@ -259,6 +342,106 @@ public class QueryBuilder {
 
 		return bottom_sel_query;
 	}
+
+
+    	/* For getting table size (Gourav_Choudhary) except DB2,MS Access and Oracle */
+
+    public String getTableVolumeQuery() {
+        String volumeQuery = "";
+
+        if (_dtype.equalsIgnoreCase(mysql)) {
+            volumeQuery = "SELECT TABLE_NAME, round(((data_length+index_length)/1024/1024),2) as \" SIZE IN MB\"";
+            volumeQuery += " FROM information_schema.TABLES WHERE TABLE_NAME = \"";
+            volumeQuery += _table1.concat("\"");
+        }
+        if (_dtype.equalsIgnoreCase(postgres)) {
+
+            volumeQuery = "SELECT pg_size_pretty(pg_total_relation_size('";
+            volumeQuery += _table1;
+            volumeQuery += "'))";
+        }
+
+        if (_dtype.equalsIgnoreCase(sqlServer)) {
+            volumeQuery = "sp_spaceused '";
+            volumeQuery += _table1;
+            volumeQuery += "'";
+        }
+
+        if (_dtype.equalsIgnoreCase(oracleNative)) {
+            volumeQuery = "select avg_row_len * num_rows from dba_tables where table_name = '";
+            volumeQuery += _table1.toUpperCase();
+            volumeQuery += "'";
+        }
+
+        return volumeQuery;
+    }
+
+
+    public String getCreateTableQuery(String colDesc,String tbName,String isConstraint,String constraintDesc ){
+
+        String strr=null,s1=null,strrC=null,s1C=null;
+        ArrayList<String> columnParams,constraints;
+        String[] colDescArray,constraintDescArray;
+        int colCount=0,constraintCount=0;
+        columnParams = new ArrayList<String>();
+        String createQuery=null;
+        /**
+         *Column Params given in  the format - column name,datatype:column name1,datatype1
+         */
+        colDescArray = colDesc.split(":");
+        colCount = colDescArray.length;
+
+        for (int i = 0; i < colCount; i++) {
+            columnParams.add(colDescArray[i]);
+        }
+
+        int noc = columnParams.size();
+
+        for (int i = 0; i < noc; i++) {
+            s1 = columnParams.get(i).replace(",", " ");
+
+            if (strr == null) {
+                strr = s1;
+            } else {
+                strr = strr + "," + s1 + " ";
+            }
+
+        }
+
+        /***Constraints**/
+        constraintDescArray = constraintDesc.split(":");
+        constraintCount = constraintDescArray.length;
+
+        constraints = new ArrayList<String>();
+
+        for (int i = 0; i < constraintCount; i++) {
+            constraints.add(constraintDescArray[i]);
+        }
+
+        int noc1 = constraints.size();
+
+        for (int i = 0; i < noc1; i++) {
+            s1C = constraints.get(i).replace(","," ");
+            if (strrC == null) {
+                strrC = "CONSTRAINT "+s1C;
+            } else {
+                strrC = strrC + " ," + " CONSTRAINT "+s1C + " ";
+            }
+
+        }
+        /****constraints ***/
+        if(isConstraint.equalsIgnoreCase("yes") || isConstraint.equalsIgnoreCase("y") ){
+            createQuery = "create table " + tbName + "(" + strr +" ," + strrC + ")";
+        }
+        else if(isConstraint.equalsIgnoreCase("no") || isConstraint.equalsIgnoreCase("n") || _dtype.equalsIgnoreCase("hive") ) {
+            strrC=" ";
+            createQuery = "create table " + tbName + "(" + strr + ")";
+        }
+        else {
+            createQuery = "create table " + tbName + "(" + strr + ")";
+        }
+        return createQuery;
+    }
 
 	/* Get the value of Top X */
 	public String top_query(boolean distinct, String col_name, String num) {
@@ -1811,7 +1994,7 @@ public class QueryBuilder {
             }
             return db_tables;
         } catch (SQLException ex) {
-            Logger.getLogger(QueryBuilder.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage());
         }
         return db_tables;
     }
@@ -1882,7 +2065,7 @@ public class QueryBuilder {
                 dbmsConn.closeConn();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(QueryBuilder.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(QueryBuilder.class.getName()).error(ex.getMessage());
         }
         return db_cols;
 

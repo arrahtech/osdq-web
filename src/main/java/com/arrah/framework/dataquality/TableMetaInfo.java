@@ -102,7 +102,7 @@ public class TableMetaInfo {
 			reporttable.cleanallRow();
 		try {
 		for (int k = i; k < j; k++) {
-			String s2 = (String) vector.elementAt(k);
+			String s2 = vector.elementAt(k);
 			ResultSet resultset = dbmd.getIndexInfo(s, s1, s2, false, true);
 
 			while (resultset.next()) {
@@ -166,7 +166,7 @@ public class TableMetaInfo {
 			reporttable.cleanallRow();
 
 		for (int k = i; k < j; k++) {
-			String s2 = (String) vector.elementAt(k);
+			String s2 = vector.elementAt(k);
 			resultset = dbmd.getColumns(s1, s, s2, null);
 			while (resultset.next()) {
 				String s3 = resultset.getString(3);
@@ -210,7 +210,7 @@ public class TableMetaInfo {
 		else
 			reporttable.cleanallRow();
 		for (int l = i; l < j; l++) {
-			String s2 = (String) vector.elementAt(l);
+			String s2 = vector.elementAt(l);
 			resultset = dbmd.getTablePrivileges(s1, s, s2);
 			while (resultset.next()) {
 				String s3 = resultset.getString(3);
@@ -255,7 +255,7 @@ public class TableMetaInfo {
 				conn.openConn();
 				dbmd = conn.getMetaData();
 			} 
-			String s17 = (String) vector.elementAt(k);
+			String s17 = vector.elementAt(k);
 			Vector<String> vector1 = new Vector<String>();
 			ResultSet resultset = dbmd.getColumns(s1, s, s17, null);
 			do {
@@ -279,7 +279,7 @@ public class TableMetaInfo {
 				String s13 = "0";
 				String s14 = "0";
 				String s15 = "0";
-				String s20 = (String) enumeration.nextElement();
+				String s20 = enumeration.nextElement();
 				QueryBuilder querybuilder = new QueryBuilder(conn, s17, s20);
 				String s4 = querybuilder.count_query_w(false, "row_count");
 				String s5 = querybuilder.count_query_w(true, "row_count");
@@ -360,7 +360,7 @@ public class TableMetaInfo {
 		int k = 0;
 
 		for (int l = i; l < j; l++) {
-			String s2 = (String) vector.elementAt(l);
+			String s2 = vector.elementAt(l);
 			ResultSet resultset = dbmd.getColumns(s1, s, s2, null);
 			while (resultset.next()) {
 				String s3 = resultset.getString(3);

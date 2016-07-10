@@ -18,20 +18,19 @@ package com.arrah.framework.dataquality;
  *
  */
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Vector;
-
-import com.arrah.dataquality.core.DataDictionaryPDF;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Vector;
 
 public class RTMUtil {
 	/*
@@ -170,43 +169,39 @@ public class RTMUtil {
 						return null;
 					}
 					if (cond == 6)
-						found = (date.compareTo((Date) obj) == 0) ? true
-								: false;
+						found = (date.compareTo((Date) obj) == 0);
 					else if (cond == 7)
-						found = (date.compareTo((Date) obj) != 0) ? true
-								: false;
+						found = (date.compareTo((Date) obj) != 0);
 					else if (cond == 8)
-						found = (date.compareTo((Date) obj) > 0) ? true : false;
+						found = (date.compareTo((Date) obj) > 0);
 					else if (cond == 9)
-						found = (date.compareTo((Date) obj) >= 0) ? true
-								: false;
+						found = (date.compareTo((Date) obj) >= 0);
 					else if (cond == 10)
-						found = (date.compareTo((Date) obj) < 0) ? true : false;
+						found = (date.compareTo((Date) obj) < 0);
 					else if (cond == 10)
-						found = (date.compareTo((Date) obj) <= 0) ? true
-								: false;
+						found = (date.compareTo((Date) obj) <= 0);
 
 				} else if (obj instanceof Number) {
 					try {
 						Double num = Double.parseDouble(condV);
 						if (cond == 6)
 							found = (((Double) obj).doubleValue() == num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 						else if (cond == 7)
 							found = (((Double) obj).doubleValue() != num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 						else if (cond == 8)
 							found = (((Double) obj).doubleValue() < num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 						else if (cond == 9)
 							found = (((Double) obj).doubleValue() <= num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 						else if (cond == 10)
 							found = (((Double) obj).doubleValue() > num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 						else if (cond == 10)
 							found = (((Double) obj).doubleValue() >= num
-									.doubleValue()) ? true : false;
+									.doubleValue());
 					} catch (NumberFormatException nexp) {
 						System.out.println("\n ERROR:Could not Parse " + condV
 								+ " for Number object");
@@ -215,23 +210,17 @@ public class RTMUtil {
 
 				} else {
 					if (cond == 6)
-						found = (condV.compareTo(obj.toString()) == 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) == 0);
 					else if (cond == 7)
-						found = (condV.compareTo(obj.toString()) != 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) != 0);
 					else if (cond == 8)
-						found = (condV.compareTo(obj.toString()) > 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) > 0);
 					else if (cond == 9)
-						found = (condV.compareTo(obj.toString()) >= 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) >= 0);
 					else if (cond == 10)
-						found = (condV.compareTo(obj.toString()) < 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) < 0);
 					else if (cond == 10)
-						found = (condV.compareTo(obj.toString()) <= 0) ? true
-								: false;
+						found = (condV.compareTo(obj.toString()) <= 0);
 				}
 				if (found == true)
 					result_v.add(i);
