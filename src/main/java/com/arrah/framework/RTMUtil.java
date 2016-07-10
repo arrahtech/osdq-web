@@ -1,4 +1,4 @@
-package com.arrah.framework.dataquality;
+package com.arrah.framework;
 
 /***********************************************
  *     Copyright to Vivek Kumar Singh	       *

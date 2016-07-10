@@ -1,4 +1,4 @@
-package com.arrah.framework.dataquality;
+package com.arrah.framework;
 
 import com.arrahtec.dataquality.util.DBConnectionConfiguration;
 import com.arrahtec.dataquality.util.DBConnectionUriParser;

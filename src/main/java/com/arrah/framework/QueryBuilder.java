@@ -1,4 +1,4 @@
-package com.arrah.framework.dataquality;
+package com.arrah.framework;
 
 /***********************************************
  *     Copyright to Vivek Kumar Singh          *
@@ -29,9 +29,6 @@ import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.arrah.framework.dataquality.Rdbms_NewConn;
-import com.arrah.framework.dataquality.TableMetaInfo;
 
 
 public class QueryBuilder {

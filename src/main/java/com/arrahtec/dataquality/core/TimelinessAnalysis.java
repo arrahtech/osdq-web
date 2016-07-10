@@ -1,7 +1,7 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.QueryBuilder;
+import com.arrah.framework.Rdbms_NewConn;
 import org.arrah.framework.profile.TimeStatisticalAnalysis;
 
 import java.sql.ResultSet;

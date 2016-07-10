@@ -1,9 +1,9 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_NewConn;
-import com.arrah.framework.dataquality.ReportTableModel;
-import com.arrah.framework.dataquality.ResultsetToRTM;
+import com.arrah.framework.QueryBuilder;
+import com.arrah.framework.Rdbms_NewConn;
+import com.arrah.framework.ReportTableModel;
+import com.arrah.framework.ResultsetToRTM;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

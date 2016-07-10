@@ -1,6 +1,6 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.ReportTableModel;
+import com.arrah.framework.ReportTableModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;

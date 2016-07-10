@@ -1,6 +1,6 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.Rdbms_NewConn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

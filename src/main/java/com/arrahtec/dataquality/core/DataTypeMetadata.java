@@ -1,8 +1,8 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.DBMetaInfo;
-import com.arrah.framework.dataquality.Rdbms_NewConn;
-import com.arrah.framework.dataquality.ReportTableModel;
+import com.arrah.framework.DBMetaInfo;
+import com.arrah.framework.Rdbms_NewConn;
+import com.arrah.framework.ReportTableModel;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -15,7 +15,8 @@ package com.arrahtec.dataquality.core;
  * in pdf format.
  */
 
-import com.arrah.framework.dataquality.*;
+import com.arrah.framework.*;
+import com.arrah.framework.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;

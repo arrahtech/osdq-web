@@ -4,10 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_NewConn;
-import com.arrah.framework.dataquality.ReportTableModel;
-import com.arrah.framework.dataquality.ResultsetToRTM;
+import com.arrah.framework.QueryBuilder;
+import com.arrah.framework.Rdbms_NewConn;
+import com.arrah.framework.ReportTableModel;
+import com.arrah.framework.ResultsetToRTM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

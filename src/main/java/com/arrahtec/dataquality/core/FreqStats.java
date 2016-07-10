@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.Rdbms_NewConn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

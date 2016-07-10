@@ -1,4 +1,4 @@
-package com.arrah.framework.dataquality;
+package com.arrah.framework;
 
 public class SqlUserTables {
     public static final String HIVE_USERTABLES="SELECT tbl_name FROM TBLS";

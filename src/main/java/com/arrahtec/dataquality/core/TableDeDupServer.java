@@ -1,6 +1,7 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.*;
+import com.arrah.framework.*;
+import com.arrah.framework.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -4,9 +4,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.arrah.framework.dataquality.FirstInformation;
-import com.arrah.framework.dataquality.QueryBuilder;
-import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.FirstInformation;
+import com.arrah.framework.QueryBuilder;
+import com.arrah.framework.Rdbms_NewConn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

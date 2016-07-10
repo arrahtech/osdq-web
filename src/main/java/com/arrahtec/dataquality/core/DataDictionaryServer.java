@@ -1,6 +1,6 @@
 package com.arrahtec.dataquality.core;
 
-import com.arrah.framework.dataquality.Rdbms_NewConn;
+import com.arrah.framework.Rdbms_NewConn;
 import com.itextpdf.text.DocumentException;
 
 import java.io.FileNotFoundException;
