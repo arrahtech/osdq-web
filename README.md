@@ -1,6 +1,11 @@
 # osdqrest (preß)   
 
+[![Download Restful osDQ(Open Source Data Quality) ](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/restful-api-for-osdq/files/latest/download)
+
   This is sister project for https://github.com/arrahtec/profiler. It provides Restful APIs for features for data quality and data preparation features. This project will help projects which want embed data quality and data preparation features in their project or UI using restful calls.
+
+> This is pre-beta release tested against mysql database. Other database like oracle, postgres, derby, informix might also
+> work (not tested), please report issue if its not working. 
 
 
 ## Getting started
@@ -12,9 +17,15 @@
 
 Please note the auth service is dummy. The APIs are currently protected using HTTP Basic authentication and default user id and password is `test/test`. The same can be changed at shiro.ini under `WEB-INF/shiro.ini` In future we will introduce the API key based authenticaton and authorization. 
 
+Every API request takes mandetory OSDQ-connectionURI HTTP header. This is custom header to pass db connection string as an standard URI specification. e.g mysql://root:root@localhost:3306/test will connect to mqsql test database on localhost:3306 
+
+So in general is follows <schema>://[userid:password@]host:[port]/[database][?param1=value1&param2=value2]
+Where schema can take supported databases names like [derby, postgres, informix, oracle-thin & sqlserver]. The underlying implementation takes care of converting above canonical connection URI into database specific jdbc url. 
+
+
 Also please note the api base url is hard coded at `WEB-INF/web.xml`, the same should be updated if you are planning to deploy this service and access over network.
 
 > If you are deploying war file, please make sure to update above files and then build war file using mvn package.
 
 
-We are just starting off, gradually we will add additional details here and at [http://arrahtec.github.io/osdqrest](homepage)
+We are just starting off, gradually we will add additional details on [this](http://arrahtec.github.io/osdqrest/) page.
