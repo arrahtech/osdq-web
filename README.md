@@ -1,4 +1,4 @@
-# osdqrest (preß)   
+# osdqrest (preß)   [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/osdq/osdq-web?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 
 [![Download Restful osDQ(Open Source Data Quality) ](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/restful-api-for-osdq/files/latest/download)
 
