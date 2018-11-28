@@ -7,7 +7,7 @@
 	<artifactId>osdq-web</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1</version>
-	<name>osdqrest</name>
+	<name>osdq-web</name>
 
 	<url>http://arrahtec.com</url>
 	<build>
@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>org.arrahtec</groupId>
 			<artifactId>osdq-core</artifactId>
-			<version>6.1.8-SNAPSHOT</version>
+			<version>6.1.9</version>
 		</dependency>
 	</dependencies>
 	<properties>
