@@ -9,7 +9,7 @@
 
 
 ## Getting started
-  1. `git clone git@github.com:arrahtec/osdqrest.git`
+  1. `git clone git@github.com:arrahtech/osdq-web.git`
   2. `mvn package`
   3. Copy osdq.war to your favourite web container like jetty or tomcat
   4. Make sure jdbc lib (of your database) is part of tomcat/jetty classpath
