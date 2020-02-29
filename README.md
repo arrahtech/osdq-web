@@ -30,3 +30,7 @@ Also please note the api base url is hard coded at `WEB-INF/web.xml`, the same s
 
 
 We are just starting off, gradually we will add additional details on [this](http://arrahtec.github.io/osdq-web/) page.
+
+
+Disclaimer by one of author (arun-y): I am providing code in the repository to you under an open source license. Because this is my personal repository, the license you receive to my code is from me and not my employer (Facebook)
+
